@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Social Media</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #121212;
+            color: #fff;
+            transition: background-color 0.5s;
+            background-image: url('background.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+            animation: fall-down 1s ease forwards;
+            opacity: 0;
+        }
+        @keyframes fall-down {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .social-links {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        .social-links a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin: 10px;
+            text-decoration: none;
+            color: #121212;
+            padding: 10px 20px;
+            border-radius: 5px;
+            background-color: #fff;
+            transition: background-color 0.3s, transform 0.3s;
+            font-size: 16px;
+            cursor: pointer;
+            text-transform: uppercase;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        .social-links a:hover {
+            background-color: #eee;
+            transform: translateY(-3px);
+        }
+        .social-links a i {
+            margin-right: 10px;
+        }
+        .twitter {
+            background-color: #1da1f2;
+        }
+        .youtube {
+            background-color: #ff0000;
+        }
+        .discord {
+            background-color: #7289da;
+        }
+        .github {
+            background-color: #333;
+        }
+        .roblox {
+            background-color: #ff0000;
+        }
+        footer {
+            margin-top: 50px;
+            text-align: center;
+            color: #aaa;
+        }
+        footer a {
+            color: #aaa;
+            text-decoration: none;
+        }
+        footer a:hover {
+            color: #fff;
+        }
+        .scroll-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #333;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: none;
+            transition: opacity 0.3s;
+            z-index: 999;
+        }
+        .scroll-to-top:hover {
+            background-color: #555;
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+                max-width: calc(100% - 20px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>My Social Media</h1>
+        <div class="social-links">
+            <a href="https://twitter.com/iptv_wallet" class="twitter"><i class="fab fa-twitter"></i> Twitter</a>
+            <a href="https://www.youtube.com/@vingaming1113" class="youtube"><i class="fab fa-youtube"></i> YouTube</a>
+            <a href="https://discord.gg/kQp2gnZq75" class="discord"><i class="fab fa-discord"></i> Discord</a>
+            <a href="https://github.com/vingaming1113" class="github"><i class="fab fa-github"></i> GitHub</a>
+            <a href="https://www.roblox.com/users/2393952839/profile" class="roblox"><i class="fab fa-roblox"></i> Roblox</a>
+        </div>
+    </div>
+    <footer>
+        <p>Contact me at: whyismyuser@outlook.com</p>
+    </footer>
+    <div class="scroll-to-top" onclick="scrollToTop()">
+        <i class="fas fa-arrow-up"></i> Back to Top
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function(event) { 
+            var container = document.querySelector('.container');
+            container.style.opacity = '1';
+        });
+
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+    </script>
+</body>
+</html>
