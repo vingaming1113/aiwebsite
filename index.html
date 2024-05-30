@@ -3,35 +3,146 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>my website👍👍</title>
+    <title>My website👍👍</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
         body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin-top: 50px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #121212;
+            color: #fff;
+            transition: background-color 0.5s;
+            background-image: url('background.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
         }
-        .link {
-            margin: 20px;
-            display: block;
-            font-size: 20px;
-            color: blue;
-            text-decoration: underline;
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+            animation: fall-down 1s ease forwards;
+            opacity: 0;
+        }
+        @keyframes fall-down {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .redirect-links {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        .redirect-links a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin: 10px;
+            text-decoration: none;
+            color: #121212;
+            padding: 10px 20px;
+            border-radius: 5px;
+            background-color: #fff;
+            transition: background-color 0.3s, transform 0.3s;
+            font-size: 16px;
             cursor: pointer;
+            text-transform: uppercase;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        .redirect-links a:hover {
+            background-color: #eee;
+            transform: translateY(-3px);
+        }
+        footer {
+            margin-top: 50px;
+            text-align: center;
+            color: #aaa;
+        }
+        footer a {
+            color: #aaa;
+            text-decoration: none;
+        }
+        footer a:hover {
+            color: #fff;
+        }
+        .scroll-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #333;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: none;
+            transition: opacity 0.3s;
+            z-index: 999;
+        }
+        .scroll-to-top:hover {
+            background-color: #555;
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+                max-width: calc(100% - 20px);
+            }
         }
     </style>
 </head>
 <body>
-    <h1>hi</h1>
-    <p>my website</p>
-    
-    <div class="link" onclick="redirectTo('https://vingaming1113.github.io/viraltweet.html')">My most popular tweets</div>
-    <div class="link" onclick="redirectTo('https://www.youtube.com/@vingaming1113')">my youtube channel</div>
-    <div class="link" onclick="redirectTo('https://twitter.com/iptv_wallet')">my twitter account</div>
-
+    <div class="container">
+        <h1>hi</h1>
+        <div class="redirect-links">
+            <a href="https://vingaming1113.github.io/viraltweet.html">most popular tweets</a>
+            <a href="https://www.example.com/page2">Go to Page 2</a>
+            <a href="https://www.example.com/page3">Go to Page 3</a>
+        </div>
+    </div>
+    <footer>
+        <p></p>
+    </footer>
+    <div class="scroll-to-top" onclick="scrollToTop()">
+        <i class="fas fa-arrow-up"></i> Back to Top
+    </div>
     <script>
-        function redirectTo(url) {
-            window.location.href = url;
+        document.addEventListener("DOMContentLoaded", function(event) { 
+            var container = document.querySelector('.container');
+            container.style.opacity = '1';
+        });
+
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
         }
+
+        // Show the scroll to top button when scrolling down
+        window.addEventListener('scroll', function() {
+            var scrollButton = document.querySelector('.scroll-to-top');
+            if (window.scrollY > 300) {
+                scrollButton.style.display = 'block';
+            } else {
+                scrollButton.style.display = 'none';
+            }
+        });
     </script>
 </body>
 </html>
