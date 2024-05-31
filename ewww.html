@@ -5,10 +5,53 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My ugly website🤮</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background-color: #ffcccb;
+            color: #000;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            margin: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #ff00ff;
+        }
+        .redirect-links a {
+            display: block;
+            margin: 10px 0;
+            color: #ff00ff;
+            text-decoration: none;
+            background-color: #fff;
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #000;
+        }
+        .redirect-links a:hover {
+            background-color: #ffff00;
+        }
+        footer {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .scroll-to-top {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            background-color: #ff00ff;
+            color: #fff;
+            padding: 10px;
+            cursor: pointer;
+            display: none;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <h1>hi</h1>
+        <h1>bye</h1>
         <div class="redirect-links">
             <a href="https://vingaming1113.github.io/socialmedia.html">Social media</a>
             <a href="https://vingaming1113.github.io/viraltweet.html">My most popular tweets</a>
@@ -19,5 +62,30 @@
     <footer>
         <p>This website is intentionally ugly. Designed by someone who has no taste.</p>
     </footer>
+    <div class="scroll-to-top" onclick="scrollToTop()">
+        <i class="fas fa-arrow-up"></i> Back to Top
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function(event) { 
+            var container = document.querySelector('.container');
+            container.style.opacity = '1';
+        });
+
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        window.addEventListener('scroll', function() {
+            var scrollButton = document.querySelector('.scroll-to-top');
+            if (window.scrollY > 300) {
+                scrollButton.style.display = 'block';
+            } else {
+                scrollButton.style.display = 'none';
+            }
+        });
+    </script>
 </body>
 </html>
