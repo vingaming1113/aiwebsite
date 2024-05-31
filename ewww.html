@@ -5,80 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My ugly website🤮</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <style>
-        body {
-            font-family: 'Comic Sans MS', cursive, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #d3d3d3;
-            color: #000;
-        }
-        .container {
-            max-width: 600px;
-            margin: 50px auto;
-            padding: 20px;
-            background-color: rgba(255, 255, 255, 0.7);
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        h1 {
-            text-align: center;
-            margin-bottom: 30px;
-            color: #ff00ff;
-            text-shadow: 2px 2px 2px #000;
-        }
-        .redirect-links {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-wrap: wrap;
-            margin-top: 20px;
-        }
-        .redirect-links a {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            margin: 10px;
-            text-decoration: none;
-            color: #fff;
-            padding: 10px 20px;
-            border-radius: 5px;
-            background-color: #ff00ff;
-            font-size: 16px;
-            cursor: pointer;
-            text-transform: uppercase;
-            box-shadow: 0 4px 6px rgba(255, 255, 255, 0.1);
-        }
-        .redirect-links a:hover {
-            background-color: #800080;
-            transform: translateY(-3px);
-        }
-        footer {
-            margin-top: 50px;
-            text-align: center;
-            color: #ff00ff;
-            text-shadow: 2px 2px 2px #000;
-        }
-        .scroll-to-top {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background-color: #800080;
-            color: #fff;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            display: none;
-            z-index: 999;
-        }
-        .scroll-to-top:hover {
-            background-color: #400040;
-        }
-    </style>
 </head>
 <body>
     <div class="container">
-        <h1>Welcome to my ugly website!</h1>
+        <h1>hi</h1>
         <div class="redirect-links">
             <a href="https://vingaming1113.github.io/socialmedia.html">Social media</a>
             <a href="https://vingaming1113.github.io/viraltweet.html">My most popular tweets</a>
@@ -89,30 +19,5 @@
     <footer>
         <p>This website is intentionally ugly. Designed by someone who has no taste.</p>
     </footer>
-    <div class="scroll-to-top" onclick="scrollToTop()">
-        <i class="fas fa-arrow-up"></i> Back to Top
-    </div>
-    <script>
-        document.addEventListener("DOMContentLoaded", function(event) { 
-            var container = document.querySelector('.container');
-            container.style.opacity = '1';
-        });
-
-        function scrollToTop() {
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
-        }
-
-        window.addEventListener('scroll', function() {
-            var scrollButton = document.querySelector('.scroll-to-top');
-            if (window.scrollY > 300) {
-                scrollButton.style.display = 'block';
-            } else {
-                scrollButton.style.display = 'none';
-            }
-        });
-    </script>
 </body>
 </html>
