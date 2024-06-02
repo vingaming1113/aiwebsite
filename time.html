@@ -42,6 +42,11 @@
     font-size: 2em;
     text-align: center;
   }
+  #date {
+    font-size: 1.5em;
+    text-align: center;
+    margin-top: 10px;
+  }
   footer {
     margin-top: 50px;
     text-align: center;
@@ -76,6 +81,7 @@
 <div class="container">
     <h1>hi</h1>
     <div id="clock"></div>
+    <div id="date"></div>
 </div>
 <footer>
     <p></p>
@@ -95,6 +101,9 @@ function updateTime() {
   hours = (hours < 10) ? "0" + hours : hours;
   minutes = (minutes < 10) ? "0" + minutes : minutes;
   seconds = (seconds < 10) ? "0" + seconds : seconds;
+  var timeString = "The time for me is currently " + hours + ":" + minutes + ":" + seconds + " " + meridiem;
+  document.getElementById("clock").textContent = timeString;
+
   var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
   var dayName = days[now.getUTCDay()];
@@ -102,8 +111,7 @@ function updateTime() {
   var month = months[now.getUTCMonth()];
   var year = now.getUTCFullYear();
   var dateString = `${dayName}, ${month} ${day}, ${year}`;
-  var timeString = "The time for me is currently " + hours + ":" + minutes + ":" + seconds + " " + meridiem;
-  document.getElementById("clock").textContent = dateString + " - " + timeString;
+  document.getElementById("date").textContent = dateString;
 }
 updateTime();
 setInterval(updateTime, 1000);
