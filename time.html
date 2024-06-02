@@ -95,8 +95,15 @@ function updateTime() {
   hours = (hours < 10) ? "0" + hours : hours;
   minutes = (minutes < 10) ? "0" + minutes : minutes;
   seconds = (seconds < 10) ? "0" + seconds : seconds;
+  var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  var dayName = days[now.getUTCDay()];
+  var day = now.getUTCDate();
+  var month = months[now.getUTCMonth()];
+  var year = now.getUTCFullYear();
+  var dateString = `${dayName}, ${month} ${day}, ${year}`;
   var timeString = "The time for me is currently " + hours + ":" + minutes + ":" + seconds + " " + meridiem;
-  document.getElementById("clock").textContent = timeString;
+  document.getElementById("clock").textContent = dateString + " - " + timeString;
 }
 updateTime();
 setInterval(updateTime, 1000);
