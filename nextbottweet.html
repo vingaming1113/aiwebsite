@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3 Hour Timer</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #121212;
+    color: #fff;
+    transition: background-color 0.5s;
+  }
+  .container {
+    max-width: 600px;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: rgba(0, 0, 0, 0.7);
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+    animation: fall-down 1s ease forwards;
+    opacity: 0;
+  }
+  @keyframes fall-down {
+    from {
+      opacity: 0;
+      transform: translateY(-50px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  h1 {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  #timer {
+    font-size: 2em;
+    text-align: center;
+  }
+  footer {
+    margin-top: 50px;
+    text-align: center;
+    color: #aaa;
+  }
+  footer a {
+    color: #aaa;
+    text-decoration: none;
+  }
+  footer a:hover {
+    color: #fff;
+  }
+  .scroll-to-top {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #333;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    display: none;
+    transition: opacity 0.3s;
+    z-index: 999;
+  }
+  .scroll-to-top:hover {
+    background-color: #555;
+  }
+</style>
+<!-- Add Twitter Card meta tags below -->
+<meta name="twitter:card" content="app">
+<meta name="twitter:site" content="@https://vingaming1113.github.io/time.html">
+<meta name="twitter:description" content="The time for me">
+</head>
+<body>
+<div class="container">
+    <h1>3 Hour Timer</h1>
+    <div id="timer">03:00:00</div>
+</div>
+<footer>
+    <p></p>
+</footer>
+<div class="scroll-to-top" onclick="scrollToTop()">
+    <i class="fas fa-arrow-up"></i> Back to Top
+</div>
+<script>
+function getRemainingTime() {
+    const now = new Date();
+    const next829PM = new Date(now);
+
+    // Set next 8:29 PM CEST
+    next829PM.setHours(20, 29, 0, 0); // 8:29 PM CEST
+
+    // If current time is past 8:29 PM, set it to the next day
+    if (now > next829PM) {
+        next829PM.setDate(next829PM.getDate() + 1);
+    }
+
+    const timeDiff = next829PM - now; // time difference in milliseconds
+    return Math.floor(timeDiff / 1000); // convert to seconds
+}
+
+let timeLeft = getRemainingTime();
+
+// Update the timer every second
+const timerInterval = setInterval(updateTimer, 1000);
+
+function updateTimer() {
+    // Calculate hours, minutes, and seconds
+    let hours = Math.floor(timeLeft / 3600);
+    let minutes = Math.floor((timeLeft % 3600) / 60);
+    let seconds = timeLeft % 60;
+
+    // Format the time as HH:MM:SS
+    hours = hours < 10 ? '0' + hours : hours;
+    minutes = minutes < 10 ? '0' + minutes : minutes;
+    seconds = seconds < 10 ? '0' + seconds : seconds;
+
+    // Display the time
+    document.getElementById('timer').textContent = `${hours}:${minutes}:${seconds}`;
+
+    // Decrement the time left
+    timeLeft--;
+
+    // Reset the timer if it reaches zero
+    if (timeLeft < 0) {
+        timeLeft = 3 * 60 * 60; // Reset to 3 hours in seconds
+    }
+}
+
+document.addEventListener("DOMContentLoaded", function(event) { 
+    var container = document.querySelector('.container');
+    container.style.opacity = '1';
+});
+
+function scrollToTop() {
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+    });
+}
+
+// Show the scroll to top button when scrolling down
+window.addEventListener('scroll', function() {
+    var scrollButton = document.querySelector('.scroll-to-top');
+    if (window.scrollY > 300) {
+        scrollButton.style.display = 'block';
+    } else {
+        scrollButton.style.display = 'none';
+    }
+});
+</script>
+</body>
+</html>
