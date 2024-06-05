@@ -88,46 +88,33 @@
     <i class="fas fa-arrow-up"></i> Back to Top
 </div>
 <script>
-function calculateNext829PM() {
+function getNextTweetTime() {
     const now = new Date();
-    const next829PM = new Date(now);
+    const startTweetTime = new Date();
+    startTweetTime.setHours(20, 29, 0, 0); // Initial tweet time 8:29 PM CEST
 
-    // Set next 8:29 PM CEST
-    next829PM.setHours(20, 29, 0, 0);
-
-    // If current time is past 8:29 PM, set it to the next day
-    if (now > next829PM) {
-        next829PM.setDate(next829PM.getDate() + 1);
+    // Calculate the next tweet time in 3-hour intervals
+    const msIn3Hours = 3 * 60 * 60 * 1000;
+    let nextTweetTime = startTweetTime;
+    
+    while (nextTweetTime <= now) {
+        nextTweetTime = new Date(nextTweetTime.getTime() + msIn3Hours);
     }
 
-    return next829PM;
+    return nextTweetTime;
 }
-
-function calculateRemainingTime(startTime, intervalSeconds) {
-    const now = new Date();
-    const elapsedSeconds = Math.floor((now - startTime) / 1000);
-    const remainingSeconds = intervalSeconds - (elapsedSeconds % intervalSeconds);
-
-    return remainingSeconds;
-}
-
-const threeHoursInSeconds = 3 * 60 * 60;
-let startTime = calculateNext829PM();
 
 function updateTimer() {
-    const timeLeft = calculateRemainingTime(startTime, threeHoursInSeconds);
+    const now = new Date();
+    const nextTweetTime = getNextTweetTime();
+    const timeDiff = nextTweetTime - now;
 
-    const hours = Math.floor(timeLeft / 3600);
-    const minutes = Math.floor((timeLeft % 3600) / 60);
-    const seconds = timeLeft % 60;
+    const hours = Math.floor(timeDiff / (1000 * 60 * 60));
+    const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
 
     const formattedTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
     document.getElementById('timer').textContent = formattedTime;
-
-    // Reset the start time if the timer reaches zero
-    if (timeLeft === 0) {
-        startTime = new Date(startTime.getTime() + threeHoursInSeconds * 1000);
-    }
 }
 
 document.addEventListener("DOMContentLoaded", function(event) { 
