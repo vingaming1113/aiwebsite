@@ -88,35 +88,46 @@
     <i class="fas fa-arrow-up"></i> Back to Top
 </div>
 <script>
-let countdownTime = 3 * 60 * 60; // 3 hours in seconds
-
-function updateTimer() {
+function calculateNext829PM() {
     const now = new Date();
-    const startTime = new Date();
-    startTime.setHours(20, 29, 0, 0); // Set to 8:29 PM CEST
+    const next829PM = new Date(now);
 
-    // Calculate the elapsed time since the start time
-    const elapsedTime = Math.floor((now - startTime) / 1000);
+    // Set next 8:29 PM CEST
+    next829PM.setHours(20, 29, 0, 0);
 
-    // If the elapsed time is negative, start the countdown from 3 hours
-    let timeLeft = countdownTime - (elapsedTime % countdownTime);
-    if (elapsedTime < 0) {
-        timeLeft = countdownTime;
+    // If current time is past 8:29 PM, set it to the next day
+    if (now > next829PM) {
+        next829PM.setDate(next829PM.getDate() + 1);
     }
 
-    // Calculate hours, minutes, and seconds
+    return next829PM;
+}
+
+function calculateRemainingTime(startTime, intervalSeconds) {
+    const now = new Date();
+    const elapsedSeconds = Math.floor((now - startTime) / 1000);
+    const remainingSeconds = intervalSeconds - (elapsedSeconds % intervalSeconds);
+
+    return remainingSeconds;
+}
+
+const threeHoursInSeconds = 3 * 60 * 60;
+let startTime = calculateNext829PM();
+
+function updateTimer() {
+    const timeLeft = calculateRemainingTime(startTime, threeHoursInSeconds);
+
     const hours = Math.floor(timeLeft / 3600);
     const minutes = Math.floor((timeLeft % 3600) / 60);
     const seconds = timeLeft % 60;
 
-    // Format the time as HH:MM:SS
-    const formattedTime = 
-        `${hours.toString().padStart(2, '0')}:` + 
-        `${minutes.toString().padStart(2, '0')}:` + 
-        `${seconds.toString().padStart(2, '0')}`;
-
-    // Display the time
+    const formattedTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
     document.getElementById('timer').textContent = formattedTime;
+
+    // Reset the start time if the timer reaches zero
+    if (timeLeft === 0) {
+        startTime = new Date(startTime.getTime() + threeHoursInSeconds * 1000);
+    }
 }
 
 document.addEventListener("DOMContentLoaded", function(event) { 
