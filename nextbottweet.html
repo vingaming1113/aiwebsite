@@ -88,53 +88,42 @@
     <i class="fas fa-arrow-up"></i> Back to Top
 </div>
 <script>
-function getRemainingTime() {
-    const now = new Date();
-    const next829PM = new Date(now);
-
-    // Set next 8:29 PM CEST
-    next829PM.setHours(20, 29, 0, 0); // 8:29 PM CEST
-
-    // If current time is past 8:29 PM, set it to the next day
-    if (now > next829PM) {
-        next829PM.setDate(next829PM.getDate() + 1);
-    }
-
-    const timeDiff = next829PM - now; // time difference in milliseconds
-    return Math.floor(timeDiff / 1000); // convert to seconds
-}
-
-let timeLeft = getRemainingTime();
-
-// Update the timer every second
-const timerInterval = setInterval(updateTimer, 1000);
+let countdownTime = 3 * 60 * 60; // 3 hours in seconds
 
 function updateTimer() {
+    const now = new Date();
+    const startTime = new Date();
+    startTime.setHours(20, 29, 0, 0); // Set to 8:29 PM CEST
+
+    // Calculate the elapsed time since the start time
+    const elapsedTime = Math.floor((now - startTime) / 1000);
+
+    // If the elapsed time is negative, start the countdown from 3 hours
+    let timeLeft = countdownTime - (elapsedTime % countdownTime);
+    if (elapsedTime < 0) {
+        timeLeft = countdownTime;
+    }
+
     // Calculate hours, minutes, and seconds
-    let hours = Math.floor(timeLeft / 3600);
-    let minutes = Math.floor((timeLeft % 3600) / 60);
-    let seconds = timeLeft % 60;
+    const hours = Math.floor(timeLeft / 3600);
+    const minutes = Math.floor((timeLeft % 3600) / 60);
+    const seconds = timeLeft % 60;
 
     // Format the time as HH:MM:SS
-    hours = hours < 10 ? '0' + hours : hours;
-    minutes = minutes < 10 ? '0' + minutes : minutes;
-    seconds = seconds < 10 ? '0' + seconds : seconds;
+    const formattedTime = 
+        `${hours.toString().padStart(2, '0')}:` + 
+        `${minutes.toString().padStart(2, '0')}:` + 
+        `${seconds.toString().padStart(2, '0')}`;
 
     // Display the time
-    document.getElementById('timer').textContent = `${hours}:${minutes}:${seconds}`;
-
-    // Decrement the time left
-    timeLeft--;
-
-    // Reset the timer if it reaches zero
-    if (timeLeft < 0) {
-        timeLeft = 3 * 60 * 60; // Reset to 3 hours in seconds
-    }
+    document.getElementById('timer').textContent = formattedTime;
 }
 
 document.addEventListener("DOMContentLoaded", function(event) { 
     var container = document.querySelector('.container');
     container.style.opacity = '1';
+    updateTimer();
+    setInterval(updateTimer, 1000);
 });
 
 function scrollToTop() {
