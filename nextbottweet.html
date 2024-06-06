@@ -57,33 +57,21 @@
   #profile-link a i {
     margin-right: 5px;
   }
-  footer {
-    margin-top: 50px;
-    text-align: center;
-    color: #aaa;
+  #discord-embed {
+    border: 1px solid #5865F2;
+    background-color: #202225;
+    padding: 20px;
+    border-radius: 8px;
+    margin-top: 20px;
   }
-  footer a {
-    color: #aaa;
-    text-decoration: none;
-  }
-  footer a:hover {
+  #discord-embed .embed-header {
     color: #fff;
+    font-weight: bold;
+    font-size: 1.2em;
+    margin-bottom: 10px;
   }
-  .scroll-to-top {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background-color: #333;
+  #discord-embed .embed-content {
     color: #fff;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    display: none;
-    transition: opacity 0.3s;
-    z-index: 999;
-  }
-  .scroll-to-top:hover {
-    background-color: #555;
   }
 </style>
 <!-- Add Twitter Card meta tags below -->
@@ -96,9 +84,17 @@
     <h1>next bot1685059 tweet</h1>
     <div id="timer">03:00:00</div>
     <div id="profile-link">
-        <a href="https://twitter.com/bot1685059/with_replies">
+        <a href="https://twitter.com/bot1685059/mx?=1">
             <i class="fab fa-twitter"></i> Link to Profile
         </a>
+    </div>
+    <div id="discord-embed">
+        <div class="embed-header">Next Tweet:</div>
+        <div class="embed-content">
+            <p>bot1685059.</p>
+            <p>Time: <span id="discord-tweet-time"></span></p>
+            <p>Content: "a"</p>
+        </div>
     </div>
 </div>
 <footer>
@@ -135,6 +131,9 @@ function updateTimer() {
 
     const formattedTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
     document.getElementById('timer').textContent = formattedTime;
+
+    // Update the time in the Discord embed
+    document.getElementById('discord-tweet-time').textContent = formattedTime;
 }
 
 document.addEventListener("DOMContentLoaded", function(event) { 
