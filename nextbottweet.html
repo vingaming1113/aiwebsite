@@ -5,79 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>bot1685059</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-<style>
-  body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #121212;
-    color: #fff;
-    transition: background-color 0.5s;
-  }
-  .container {
-    max-width: 600px;
-    margin: 50px auto;
-    padding: 20px;
-    background-color: rgba(0, 0, 0, 0.7);
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
-    animation: fall-down 1s ease forwards;
-    opacity: 0;
-  }
-  @keyframes fall-down {
-    from {
-      opacity: 0;
-      transform: translateY(-50px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  h1 {
-    text-align: center;
-    margin-bottom: 30px;
-  }
-  #timer {
-    font-size: 2em;
-    text-align: center;
-  }
-  #profile-link {
-    text-align: center;
-    margin-top: 20px;
-  }
-  #profile-link a {
-    color: #fff;
-    text-decoration: none;
-    display: inline-block;
-    background-color: #1DA1F2;
-    padding: 10px 20px;
-    border-radius: 5px;
-  }
-  #profile-link a i {
-    margin-right: 5px;
-  }
-  #discord-embed {
-    border: 1px solid #5865F2;
-    background-color: #202225;
-    padding: 20px;
-    border-radius: 8px;
-    margin-top: 20px;
-  }
-  #discord-embed .embed-header {
-    color: #fff;
-    font-weight: bold;
-    font-size: 1.2em;
-    margin-bottom: 10px;
-  }
-  #discord-embed .embed-content {
-    color: #fff;
-  }
-</style>
-<!-- Add Twitter Card meta tags below -->
-<meta name="twitter:card" content="app">
-<meta name="twitter:https://vingaming1113.github.io/nextbottweet" content="@https://vingaming1113.github.io/nextbottweet">
-<meta name="twitter:hi" content="next bot1685059 tweet">
+<!-- Add Open Graph meta tags for Discord embed -->
+<meta property="og:title" content="Next bot1685059 Tweet">
+<meta property="og:description" content="This is the next tweet from bot1685059.">
+<meta property="og:url" content="https://vingaming1113.github.io/nextbottweet">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://example.com/image.jpg"> <!-- Replace with an image URL -->
+<meta property="og:image:width" content="400">
+<meta property="og:image:height" content="400">
 </head>
 <body>
 <div class="container">
@@ -87,14 +22,6 @@
         <a href="https://twitter.com/bot1685059/mx?=1">
             <i class="fab fa-twitter"></i> Link to Profile
         </a>
-    </div>
-    <div id="discord-embed">
-        <div class="embed-header">Next Tweet:</div>
-        <div class="embed-content">
-            <p>bot1685059.</p>
-            <p>Time: <span id="discord-tweet-time"></span></p>
-            <p>Content: "a"</p>
-        </div>
     </div>
 </div>
 <footer>
@@ -131,9 +58,6 @@ function updateTimer() {
 
     const formattedTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
     document.getElementById('timer').textContent = formattedTime;
-
-    // Update the time in the Discord embed
-    document.getElementById('discord-tweet-time').textContent = formattedTime;
 }
 
 document.addEventListener("DOMContentLoaded", function(event) { 
