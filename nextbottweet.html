@@ -6,98 +6,8 @@
 <title>bot1685059</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 <style>
-  body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #121212;
-    color: #fff;
-    transition: background-color 0.5s;
-  }
-  .container {
-    max-width: 600px;
-    margin: 50px auto;
-    padding: 20px;
-    background-color: rgba(0, 0, 0, 0.7);
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
-    animation: fall-down 1s ease forwards;
-    opacity: 0;
-  }
-  @keyframes fall-down {
-    from {
-      opacity: 0;
-      transform: translateY(-50px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  h1 {
-    text-align: center;
-    margin-bottom: 30px;
-  }
-  #timer {
-    font-size: 2em;
-    text-align: center;
-  }
-  #profile-link {
-    text-align: center;
-    margin-top: 20px;
-  }
-  #profile-link a {
-    color: #fff;
-    text-decoration: none;
-    display: inline-block;
-    background-color: #1DA1F2;
-    padding: 10px 20px;
-    border-radius: 5px;
-  }
-  #profile-link a i {
-    margin-right: 5px;
-  }
-  footer {
-    margin-top: 50px;
-    text-align: center;
-    color: #aaa;
-  }
-  footer a {
-    color: #aaa;
-    text-decoration: none;
-  }
-  footer a:hover {
-    color: #fff;
-  }
-  .scroll-to-top {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background-color: #333;
-    color: #fff;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    display: none;
-    transition: opacity 0.3s;
-    z-index: 999;
-  }
-  .scroll-to-top:hover {
-    background-color: #555;
-  }
+  /* Your CSS styles here */
 </style>
-<!-- Add Twitter Card meta tags below -->
-<meta name="twitter:card" content="summary">
-<meta name="twitter:site" content="@bot1685059">
-<meta name="twitter:title" content="Next bot1685059 Tweet">
-<meta name="twitter:description" content="timer">
-<meta name="twitter:image" content="https://vingaming1113.github.io/iptv.jpg"> <!-- Replace with an image URL -->
-<meta property="og:title" content="Next bot1685059 Tweet">
-<meta property="og:description" content="timer">
-<meta property="og:image" content="https://vingaming1113.github.io
-/iptv.jpg"> <!-- Replace with an image URL -->
-<meta property="og:url" content="https://vingaming1113.github.io/nextbottweet">
-<meta property="og:type" content="website">
 </head>
 <body>
 <div class="container">
@@ -137,12 +47,32 @@ function updateTimer() {
     const nextTweetTime = getNextTweetTime();
     const timeDiff = nextTweetTime - now;
 
+    if (timeDiff <= 0) {
+        // Display notification
+        showNotification("It's time for the next tweet!");
+        return;
+    }
+
     const hours = Math.floor(timeDiff / (1000 * 60 * 60));
     const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
     const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
 
     const formattedTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
     document.getElementById('timer').textContent = formattedTime;
+}
+
+function showNotification(message) {
+    if (!("Notification" in window)) {
+        alert(message);
+    } else if (Notification.permission === "granted") {
+        new Notification(message);
+    } else if (Notification.permission !== "denied") {
+        Notification.requestPermission().then(function (permission) {
+            if (permission === "granted") {
+                new Notification(message);
+            }
+        });
+    }
 }
 
 document.addEventListener("DOMContentLoaded", function(event) { 
