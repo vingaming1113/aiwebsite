@@ -3,141 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Time Traveler</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-        }
-        #container {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 300px;
-            text-align: center;
-        }
-        input {
-            margin: 5px 0;
-            padding: 5px;
-            width: calc(100% - 10px);
-        }
-        button {
-            margin: 5px 0;
-            padding: 10px;
-            width: 100%;
-            background-color: #007BFF;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        .output {
-            margin: 10px 0;
-            font-weight: bold;
-        }
-    </style>
+    <title>Advanced Time Traveler</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
 <div id="container">
     <h1>Time Traveler</h1>
     <div class="output" id="current-time"></div>
-    <div>
-        <label for="days">Days:</label>
-        <input type="number" id="days" placeholder="Enter days">
-        <button onclick="travelDays()">Travel Days</button>
-    </div>
-    <div>
-        <label for="weeks">Weeks:</label>
-        <input type="number" id="weeks" placeholder="Enter weeks">
-        <button onclick="travelWeeks()">Travel Weeks</button>
-    </div>
-    <div>
-        <label for="months">Months:</label>
-        <input type="number" id="months" placeholder="Enter months">
-        <button onclick="travelMonths()">Travel Months</button>
-    </div>
-    <div>
-        <label for="years">Years:</label>
-        <input type="number" id="years" placeholder="Enter years">
-        <button onclick="travelYears()">Travel Years</button>
-    </div>
-    <div>
-        <label for="specific-date">Specific Date (YYYY-MM-DD):</label>
-        <input type="date" id="specific-date">
-        <button onclick="travelToSpecificDate()">Travel to Date</button>
+    <div class="control-panel">
+        <div>
+            <label for="days">Days:</label>
+            <input type="number" id="days" placeholder="Enter days">
+            <button class="travel-button" onclick="travelDays()">Travel Days</button>
+        </div>
+        <div>
+            <label for="weeks">Weeks:</label>
+            <input type="number" id="weeks" placeholder="Enter weeks">
+            <button class="travel-button" onclick="travelWeeks()">Travel Weeks</button>
+        </div>
+        <div>
+            <label for="months">Months:</label>
+            <input type="number" id="months" placeholder="Enter months">
+            <button class="travel-button" onclick="travelMonths()">Travel Months</button>
+        </div>
+        <div>
+            <label for="years">Years:</label>
+            <input type="number" id="years" placeholder="Enter years">
+            <button class="travel-button" onclick="travelYears()">Travel Years</button>
+        </div>
+        <div>
+            <label for="specific-date">Specific Date (YYYY-MM-DD):</label>
+            <input type="date" id="specific-date">
+            <button class="travel-button" onclick="travelToSpecificDate()">Travel to Date</button>
+        </div>
     </div>
 </div>
 
-<script>
-    let currentTime = new Date();
-    updateDisplay();
-
-    function updateDisplay() {
-        document.getElementById('current-time').innerText = `Current simulated date and time: ${currentTime.toISOString().slice(0, 19).replace('T', ' ')}`;
-    }
-
-    function travelDays() {
-        const days = parseInt(document.getElementById('days').value);
-        if (!isNaN(days)) {
-            currentTime.setDate(currentTime.getDate() + days);
-            updateDisplay();
-        } else {
-            alert("Please enter a valid number of days.");
-        }
-    }
-
-    function travelWeeks() {
-        const weeks = parseInt(document.getElementById('weeks').value);
-        if (!isNaN(weeks)) {
-            currentTime.setDate(currentTime.getDate() + (weeks * 7));
-            updateDisplay();
-        } else {
-            alert("Please enter a valid number of weeks.");
-        }
-    }
-
-    function travelMonths() {
-        const months = parseInt(document.getElementById('months').value);
-        if (!isNaN(months)) {
-            currentTime.setMonth(currentTime.getMonth() + months);
-            updateDisplay();
-        } else {
-            alert("Please enter a valid number of months.");
-        }
-    }
-
-    function travelYears() {
-        const years = parseInt(document.getElementById('years').value);
-        if (!isNaN(years)) {
-            currentTime.setFullYear(currentTime.getFullYear() + years);
-            updateDisplay();
-        } else {
-            alert("Please enter a valid number of years.");
-        }
-    }
-
-    function travelToSpecificDate() {
-        const dateStr = document.getElementById('specific-date').value;
-        const date = new Date(dateStr);
-        if (!isNaN(date.getTime())) {
-            currentTime = date;
-            updateDisplay();
-        } else {
-            alert("Please enter a valid date in YYYY-MM-DD format.");
-        }
-    }
-</script>
+<script src="script.js"></script>
 
 </body>
 </html>
