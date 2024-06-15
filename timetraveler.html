@@ -44,6 +44,13 @@
             <button class="travel-button" onclick="travelToSpecificDate()">Travel to Date</button>
         </div>
         <div>
+            <label for="destination-lat">Destination Latitude:</label>
+            <input type="number" id="destination-lat" step="0.01" placeholder="Enter latitude">
+            <label for="destination-lng">Destination Longitude:</label>
+            <input type="number" id="destination-lng" step="0.01" placeholder="Enter longitude">
+            <button class="travel-button" onclick="travelToDestination()">Travel to Destination</button>
+        </div>
+        <div>
             <button class="reset-button" onclick="resetMachine()">Reset Machine</button>
         </div>
     </div>
