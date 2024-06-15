@@ -1,19 +1,17 @@
 let currentTime = new Date();
-let travelSpeed = 1; // Speed factor, could be adjusted for more dynamic simulations
+let travelSpeed = 1; // Speed factor, adjustable via the speed slider
 let map, marker;
 let isMachineBroken = false;
 
 function initMap() {
-    map = L.map('map').setView([0, 0], 3); // Increased initial zoom level
+    map = L.map('map').setView([0, 0], 3);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
 
-    // Initialize marker with a default location (0, 0)
     marker = L.marker([0, 0]).addTo(map);
 
-    // Attempt to get user's current location
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition((position) => {
             const { latitude, longitude } = position.coords;
@@ -22,11 +20,9 @@ function initMap() {
             marker.setLatLng(userLocation);
             updateLocationDisplay(userLocation);
         }, () => {
-            // Handle geolocation error
             alert('Error: The Geolocation service failed.');
         });
     } else {
-        // Browser doesn't support Geolocation
         alert('Error: Your browser does not support geolocation.');
     }
 }
@@ -48,48 +44,47 @@ function addAnimation() {
     setTimeout(() => timeDisplay.classList.add('flash'), 10);
 }
 
-function simulateTimeTravel(days) {
+function simulateTimeTravel(seconds) {
     if (isMachineBroken) {
         alert("The time machine is broken! Please reset it.");
         return;
     }
 
-    if (Math.random() < 0.02 * travelSpeed) { // Chance of machine breaking scales with speed
+    if (Math.random() < travelSpeed / 100) {
         alert("The time machine has broken!");
         isMachineBroken = true;
         return;
     }
 
-    if (Math.random() < 0.05 * travelSpeed) { // Chance of time travel failure scales with speed
-        alert("Time travel failed!");
-        return;
-    }
-
-    warpAnimation(); // Trigger warp animation
+    const speedFactor = parseFloat(travelSpeed);
+    warpAnimation();
 
     setTimeout(() => {
-        currentTime.setDate(currentTime.getDate() + days);
+        currentTime.setSeconds(currentTime.getSeconds() + seconds * speedFactor);
         updateDisplay();
 
-        const randomShift = () => (Math.random() - 0.5) * 0.02; // Small random shift in location
+        const randomShift = () => (Math.random() - 0.5) * 0.02;
         const newLocation = [
             marker.getLatLng().lat + randomShift(),
             marker.getLatLng().lng + randomShift()
         ];
         updateLocationDisplay(newLocation);
-    }, 2000); // Delay to simulate time warp effect
+    }, 2000);
 }
 
-function updateSpeed() {
-    const selectedSpeed = document.getElementById('speed').value;
-    travelSpeed = selectedSpeed;
-    document.getElementById('speed-display').innerText = `${travelSpeed}x`;
+function travelSeconds() {
+    const seconds = parseInt(document.getElementById('seconds').value);
+    if (!isNaN(seconds)) {
+        simulateTimeTravel(seconds);
+    } else {
+        alert("Please enter a valid number of seconds.");
+    }
 }
 
 function travelDays() {
     const days = parseInt(document.getElementById('days').value);
     if (!isNaN(days)) {
-        simulateTimeTravel(days);
+        simulateTimeTravel(days * 86400);
     } else {
         alert("Please enter a valid number of days.");
     }
@@ -98,7 +93,7 @@ function travelDays() {
 function travelWeeks() {
     const weeks = parseInt(document.getElementById('weeks').value);
     if (!isNaN(weeks)) {
-        simulateTimeTravel(weeks * 7);
+        simulateTimeTravel(weeks * 604800);
     } else {
         alert("Please enter a valid number of weeks.");
     }
@@ -107,7 +102,7 @@ function travelWeeks() {
 function travelMonths() {
     const months = parseInt(document.getElementById('months').value);
     if (!isNaN(months)) {
-        simulateTimeTravel(months * 30);
+        simulateTimeTravel(months * 2592000);
     } else {
         alert("Please enter a valid number of months.");
     }
@@ -116,7 +111,7 @@ function travelMonths() {
 function travelYears() {
     const years = parseInt(document.getElementById('years').value);
     if (!isNaN(years)) {
-        simulateTimeTravel(years * 365);
+        simulateTimeTravel(years * 31536000);
     } else {
         alert("Please enter a valid number of years.");
     }
@@ -147,18 +142,13 @@ function travelToDestination() {
         return;
     }
 
-    if (Math.random() < 0.02 * travelSpeed) { // Chance of machine breaking scales with speed
+    if (Math.random() < travelSpeed / 100) {
         alert("The time machine has broken!");
         isMachineBroken = true;
         return;
     }
 
-    if (Math.random() < 0.05 * travelSpeed) { // Chance of time travel failure scales with speed
-        alert("Time travel failed!");
-        return;
-    }
-
-    warpAnimation(); // Trigger warp animation
+    warpAnimation();
 
     setTimeout(() => {
         const newLocation = [lat, lng];
@@ -168,7 +158,7 @@ function travelToDestination() {
 
         currentTime = new Date(); // Reset time to current time after arrival
         updateDisplay();
-    }, 2000); // Delay to simulate time warp effect
+    }, 2000);
 }
 
 function resetMachine() {
@@ -181,8 +171,13 @@ function warpAnimation() {
     container.classList.add('warp-animation');
     setTimeout(() => {
         container.classList.remove('warp-animation');
-    }, 2000); // Same delay as simulateTimeTravel
+    }, 2000);
 }
+
+document.getElementById('speed').addEventListener('input', function() {
+    travelSpeed = this.value;
+    document.getElementById('speed-value').innerText = `${travelSpeed}x`;
+});
 
 document.addEventListener("DOMContentLoaded", () => {
     updateDisplay();
