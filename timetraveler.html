@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Time Traveler</title>
+    <title>Advanced Time Traveler</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap" async defer></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
 </head>
 <body>
 
@@ -40,10 +40,14 @@
             <input type="date" id="specific-date">
             <button class="travel-button" onclick="travelToSpecificDate()">Travel to Date</button>
         </div>
+        <div>
+            <button class="travel-button" onclick="resetMachine()">Reset Machine</button>
+        </div>
     </div>
     <div class="output" id="travel-speed"></div>
 </div>
 
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script src="script.js"></script>
 
 </body>
