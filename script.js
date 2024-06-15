@@ -1,8 +1,10 @@
+// Global variables
 let currentTime = new Date();
 let travelSpeed = 1; // Speed factor, could be adjusted for more dynamic simulations
 let map, marker;
 let isMachineBroken = false;
 
+// Initialize the Leaflet map
 function initMap() {
     map = L.map('map').setView([0, 0], 3); // Increased initial zoom level
 
@@ -31,23 +33,28 @@ function initMap() {
     }
 }
 
+// Update display elements with current time and speed
 function updateDisplay() {
     document.getElementById('current-time').innerText = `Current simulated date and time: ${currentTime.toISOString().slice(0, 19).replace('T', ' ')}`;
     document.getElementById('travel-speed').innerText = `Current travel speed: ${travelSpeed}x`;
     addAnimation();
+    updateSpeedometer();
 }
 
+// Update current location display
 function updateLocationDisplay(location) {
     document.getElementById('current-location').innerText = `Current location: Lat ${location[0].toFixed(2)}, Lng ${location[1].toFixed(2)}`;
     marker.setLatLng(location);
 }
 
+// Add flash animation to current time display
 function addAnimation() {
     const timeDisplay = document.getElementById('current-time');
     timeDisplay.classList.remove('flash');
     setTimeout(() => timeDisplay.classList.add('flash'), 10);
 }
 
+// Simulate time travel based on days
 function simulateTimeTravel(days) {
     if (isMachineBroken) {
         alert("The time machine is broken! Please reset it.");
@@ -66,8 +73,7 @@ function simulateTimeTravel(days) {
     }
 
     const selectedSpeed = document.getElementById('speed').value;
-    const speedFactor = parseFloat(selectedSpeed);
-    travelSpeed = speedFactor.toFixed(2);
+    travelSpeed = parseFloat(selectedSpeed);
 
     warpAnimation(); // Trigger warp animation
 
@@ -84,6 +90,7 @@ function simulateTimeTravel(days) {
     }, 2000); // Delay to simulate time warp effect
 }
 
+// Travel functions based on user input (days, weeks, months, years, specific date)
 function travelDays() {
     const days = parseInt(document.getElementById('days').value);
     if (!isNaN(days)) {
@@ -157,8 +164,7 @@ function travelToDestination() {
     }
 
     const selectedSpeed = document.getElementById('speed').value;
-    const speedFactor = parseFloat(selectedSpeed);
-    travelSpeed = speedFactor.toFixed(2);
+    travelSpeed = parseFloat(selectedSpeed);
 
     warpAnimation(); // Trigger warp animation
 
@@ -173,11 +179,13 @@ function travelToDestination() {
     }, 2000); // Delay to simulate time warp effect
 }
 
+// Reset the time machine
 function resetMachine() {
     isMachineBroken = false;
     alert("The time machine has been reset.");
 }
 
+// Warp animation effect
 function warpAnimation() {
     const container = document.getElementById('container');
     container.classList.add('warp-animation');
@@ -186,7 +194,21 @@ function warpAnimation() {
     }, 2000); // Same delay as simulateTimeTravel
 }
 
+// Initialize the application when DOM content is loaded
 document.addEventListener("DOMContentLoaded", () => {
     updateDisplay();
     initMap();
 });
+
+// Update the speedometer display based on current speed
+function updateSpeedometer() {
+    const needle = document.getElementById('speedometer-needle');
+    const valueDisplay = document.getElementById('speedometer-value');
+    
+    // Calculate rotation angle based on current speed
+    const rotation = (travelSpeed - 1) * 60; // 1x speed is at 0 degrees, 2x speed is at 60 degrees, etc.
+    needle.style.transform = `translateX(-50%) rotate(${rotation}deg)`;
+
+    // Display current speed value
+    valueDisplay.textContent = `${travelSpeed.toFixed(2)}x`;
+}
