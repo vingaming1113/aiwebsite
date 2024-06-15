@@ -1,3 +1,4 @@
+/* General styling */
 body {
     font-family: 'Roboto', sans-serif;
     background: linear-gradient(to bottom right, #2c3e50, #3498db);
@@ -24,29 +25,128 @@ body {
     to { opacity: 1; }
 }
 
-@keyframes warpEffect {
-    0% {
-        transform: scale(1);
-        opacity: 1;
-    }
-    50% {
-        transform: scale(1.5);
-        opacity: 0.5;
-    }
-    100% {
-        transform: scale(1);
-        opacity: 1;
-    }
+/* Speedometer section */
+.speedometer {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-.warp-animation {
-    animation: warpEffect 2s ease-in-out;
+.meter {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    background-color: #34495e; /* Dark background color */
+    border-radius: 50%; /* Circular shape */
+    overflow: hidden; /* Hide overflow */
+    margin: 0 auto; /* Center horizontally */
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5); /* Shadow for depth */
+    transition: box-shadow 0.3s ease; /* Smooth shadow transition */
 }
 
-h1 {
-    margin-bottom: 20px;
+.meter:hover {
+    box-shadow: 0 0 25px rgba(0, 0, 0, 0.7); /* Shadow on hover */
 }
 
+#speedometer-needle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 4px; /* Needle width */
+    height: 50%; /* Needle height */
+    background-color: #e74c3c; /* Needle color */
+    transform-origin: bottom; /* Rotate around bottom */
+    transform: translateX(-50%) rotate(0deg); /* Center and initial rotation */
+    transition: transform 0.5s ease; /* Smooth transition */
+}
+
+#speedometer-value {
+    font-size: 24px; /* Font size */
+    font-weight: bold; /* Bold text */
+    color: #ecf0f1; /* Text color */
+    text-align: center; /* Center text */
+    margin-top: 10px; /* Margin top */
+}
+
+.speedometer-label {
+    font-size: 16px; /* Label font size */
+    color: #bdc3c7; /* Label color */
+    text-align: center; /* Center label */
+    margin-top: 5px; /* Margin top */
+}
+
+.speedometer-range {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    transform-origin: bottom; /* Rotate around bottom */
+    pointer-events: none; /* Disable pointer events */
+}
+
+.speedometer-range::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 2px; /* Tick mark width */
+    height: 10%; /* Tick mark height */
+    background-color: #bdc3c7; /* Tick mark color */
+    transform: translateX(-50%) translateY(-100%) rotate(0deg); /* Center and initial rotation */
+}
+
+.speedometer-range::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 4px; /* Main tick mark width */
+    height: 20%; /* Main tick mark height */
+    background-color: #bdc3c7; /* Main tick mark color */
+    transform: translateX(-50%) translateY(-100%) rotate(0deg); /* Center and initial rotation */
+}
+
+.speedometer-range-1::before {
+    transform: translateX(-50%) translateY(-100%) rotate(60deg); /* Rotate tick mark */
+}
+
+.speedometer-range-1::after {
+    transform: translateX(-50%) translateY(-100%) rotate(60deg); /* Rotate main tick mark */
+}
+
+.speedometer-range-2::before {
+    transform: translateX(-50%) translateY(-100%) rotate(120deg); /* Rotate tick mark */
+}
+
+.speedometer-range-2::after {
+    transform: translateX(-50%) translateY(-100%) rotate(120deg); /* Rotate main tick mark */
+}
+
+.speedometer-range-3::before {
+    transform: translateX(-50%) translateY(-100%) rotate(180deg); /* Rotate tick mark */
+}
+
+.speedometer-range-3::after {
+    transform: translateX(-50%) translateY(-100%) rotate(180deg); /* Rotate main tick mark */
+}
+
+.speedometer-range-4::before {
+    transform: translateX(-50%) translateY(-100%) rotate(240deg); /* Rotate tick mark */
+}
+
+.speedometer-range-4::after {
+    transform: translateX(-50%) translateY(-100%) rotate(240deg); /* Rotate main tick mark */
+}
+
+.speedometer-range-5::before {
+    transform: translateX(-50%) translateY(-100%) rotate(300deg); /* Rotate tick mark */
+}
+
+.speedometer-range-5::after {
+    transform: translateX(-50%) translateY(-100%) rotate(300deg); /* Rotate main tick mark */
+}
+
+/* Control panel and map styling */
 .output {
     font-size: 18px;
     margin-bottom: 20px;
