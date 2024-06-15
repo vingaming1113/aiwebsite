@@ -1,22 +1,34 @@
 let currentTime = new Date();
 let travelSpeed = 1; // Speed factor, could be adjusted for more dynamic simulations
 let map, marker;
+let isMachineBroken = false;
 
 function initMap() {
-    navigator.geolocation.getCurrentPosition((position) => {
-        const { latitude, longitude } = position.coords;
-        const userLocation = [latitude, longitude];
+    map = L.map('map').setView([0, 0], 2);
 
-        map = L.map('map').setView(userLocation, 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
 
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(map);
+    // Initialize marker with a default location (0, 0)
+    marker = L.marker([0, 0]).addTo(map);
 
-        marker = L.marker(userLocation).addTo(map);
-
-        updateLocationDisplay(userLocation);
-    });
+    // Attempt to get user's current location
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition((position) => {
+            const { latitude, longitude } = position.coords;
+            const userLocation = [latitude, longitude];
+            map.setView(userLocation, 13);
+            marker.setLatLng(userLocation);
+            updateLocationDisplay(userLocation);
+        }, () => {
+            // Handle geolocation error
+            alert('Error: The Geolocation service failed.');
+        });
+    } else {
+        // Browser doesn't support Geolocation
+        alert('Error: Your browser does not support geolocation.');
+    }
 }
 
 function updateDisplay() {
@@ -28,7 +40,6 @@ function updateDisplay() {
 function updateLocationDisplay(location) {
     document.getElementById('current-location').innerText = `Current location: Lat ${location[0].toFixed(2)}, Lng ${location[1].toFixed(2)}`;
     marker.setLatLng(location);
-    map.setView(location);
 }
 
 function addAnimation() {
@@ -38,6 +49,17 @@ function addAnimation() {
 }
 
 function simulateTimeTravel(days) {
+    if (isMachineBroken) {
+        alert("The time machine is broken! Please reset it.");
+        return;
+    }
+
+    if (Math.random() < 0.05) { // 5% chance of time machine breaking
+        alert("The time machine has broken!");
+        isMachineBroken = true;
+        return;
+    }
+
     if (Math.random() < 0.1) { // 10% chance of time travel failure
         alert("Time travel failed!");
         return;
@@ -46,15 +68,19 @@ function simulateTimeTravel(days) {
     const speedFactor = Math.random() * 2 + 1; // Random speed factor between 1 and 3
     travelSpeed = speedFactor.toFixed(2);
 
-    currentTime.setDate(currentTime.getDate() + days);
-    updateDisplay();
+    warpAnimation(); // Trigger warp animation
 
-    const randomShift = () => (Math.random() - 0.5) * 0.02; // Small random shift in location
-    const newLocation = [
-        marker.getLatLng().lat + randomShift(),
-        marker.getLatLng().lng + randomShift()
-    ];
-    updateLocationDisplay(newLocation);
+    setTimeout(() => {
+        currentTime.setDate(currentTime.getDate() + days);
+        updateDisplay();
+
+        const randomShift = () => (Math.random() - 0.5) * 0.02; // Small random shift in location
+        const newLocation = [
+            marker.getLatLng().lat + randomShift(),
+            marker.getLatLng().lng + randomShift()
+        ];
+        updateLocationDisplay(newLocation);
+    }, 2000); // Delay to simulate time warp effect
 }
 
 function travelDays() {
@@ -102,6 +128,19 @@ function travelToSpecificDate() {
     } else {
         alert("Please enter a valid date in YYYY-MM-DD format.");
     }
+}
+
+function resetMachine() {
+    isMachineBroken = false;
+    alert("The time machine has been reset.");
+}
+
+function warpAnimation() {
+    const container = document.getElementById('container');
+    container.classList.add('warp-animation');
+    setTimeout(() => {
+        container.classList.remove('warp-animation');
+    }, 2000); // Same delay as simulateTimeTravel
 }
 
 document.addEventListener("DOMContentLoaded", () => {
