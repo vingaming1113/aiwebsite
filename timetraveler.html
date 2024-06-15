@@ -50,21 +50,10 @@
             <input type="number" id="destination-lng" step="0.01" placeholder="Enter longitude">
             <button class="travel-button" onclick="travelToDestination()">Travel to Destination</button>
         </div>
-        <div>
+        <div class="speed-selector">
             <label for="speed">Time Travel Speed:</label>
-            <input type="range" id="speed" min="0" max="3" step="0.5" value="1" onchange="updateSpeed()">
-            <div id="speedometer">
-                <div id="speedometer-needle"></div>
-                <div id="speedometer-labels">
-                    <span>0</span>
-                    <span>0.5</span>
-                    <span>1</span>
-                    <span>1.5</span>
-                    <span>2</span>
-                    <span>2.5</span>
-                    <span>3</span>
-                </div>
-            </div>
+            <input type="range" id="speed" min="0" max="3" step="0.5" value="1" oninput="updateSpeed()">
+            <span id="speed-display">1x</span>
         </div>
         <div>
             <button class="reset-button" onclick="resetMachine()">Reset Machine</button>
