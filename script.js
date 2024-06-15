@@ -2,6 +2,8 @@ let currentTime = new Date();
 let travelSpeed = 1; // Speed factor, could be adjusted for more dynamic simulations
 let map, marker;
 let isMachineBroken = false;
+let energyLevel = 100; // Initial energy level
+const travelLog = [];
 
 function initMap() {
     map = L.map('map').setView([0, 0], 3); // Increased initial zoom level
@@ -34,6 +36,7 @@ function initMap() {
 function updateDisplay() {
     document.getElementById('current-time').innerText = `Current simulated date and time: ${currentTime.toISOString().slice(0, 19).replace('T', ' ')}`;
     document.getElementById('travel-speed').innerText = `Current travel speed: ${travelSpeed}x`;
+    document.getElementById('energy-level').innerText = `Energy Level: ${energyLevel}%`;
     addAnimation();
 }
 
@@ -80,6 +83,11 @@ function simulateTimeTravel(days) {
             marker.getLatLng().lng + randomShift()
         ];
         updateLocationDisplay(newLocation);
+
+        // Update travel log
+        const travelInfo = `Traveled ${days} days. New location: ${newLocation[0].toFixed(2)}, ${newLocation[1].toFixed(2)}`;
+        travelLog.push(travelInfo);
+        updateTravelLog();
     }, 2000); // Delay to simulate time warp effect
 }
 
@@ -168,6 +176,11 @@ function travelToDestination() {
 
         currentTime = new Date(); // Reset time to current time after arrival
         updateDisplay();
+
+        // Update travel log
+        const travelInfo = `Traveled to destination at ${newLocation[0].toFixed(2)}, ${newLocation[1].toFixed(2)}`;
+        travelLog.push(travelInfo);
+        updateTravelLog();
     }, 2000); // Delay to simulate time warp effect
 }
 
@@ -211,6 +224,16 @@ function warpAnimation() {
     }, 2000); // Same delay as simulateTimeTravel
 }
 
+function updateTravelLog() {
+    const travelLogElement = document.getElementById('travel-log');
+    travelLogElement.innerHTML = '';
+    travelLog.forEach((log, index) => {
+        const logItem = document.createElement('div');
+        logItem.textContent = `${index + 1}. ${log}`;
+        travelLogElement.appendChild(logItem);
+    });
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     updateDisplay();
     initMap();
@@ -220,4 +243,13 @@ document.addEventListener("DOMContentLoaded", () => {
     speedSlider.addEventListener('input', (event) => {
         speedValue.textContent = `${event.target.value}x`;
     });
+
+    // Energy level regeneration simulation
+    setInterval(() => {
+        if (energyLevel < 100) {
+            energyLevel += 5; // Energy regenerates 5% every 10 seconds
+            if (energyLevel > 100) energyLevel = 100; // Cap energy level at 100%
+            updateDisplay();
+        }
+    }, 10000); // 10 seconds interval for energy regeneration
 });
