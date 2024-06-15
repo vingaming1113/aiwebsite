@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Advanced Time Traveler</title>
+    <meta property="og:title" content="Advanced Time Traveler">
+    <meta property="og:description" content="Simulate time travel with this advanced time traveler tool. Experience realistic travel speeds and the possibility of machine failure.">
+    <meta property="og:image" content="https://example.com/preview-image.jpg">
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
 </head>
@@ -39,6 +42,9 @@
             <label for="specific-date">Specific Date (YYYY-MM-DD):</label>
             <input type="date" id="specific-date">
             <button class="travel-button" onclick="travelToSpecificDate()">Travel to Date</button>
+        </div>
+        <div>
+            <button class="reset-button" onclick="resetMachine()">Reset Machine</button>
         </div>
     </div>
     <div class="output" id="travel-speed"></div>
