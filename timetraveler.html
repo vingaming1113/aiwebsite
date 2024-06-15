@@ -19,6 +19,11 @@
     <div class="output" id="current-location"></div>
     <div class="control-panel">
         <div>
+            <label for="seconds">Seconds:</label>
+            <input type="number" id="seconds" placeholder="Enter seconds">
+            <button class="travel-button" onclick="travelSeconds()">Travel Seconds</button>
+        </div>
+        <div>
             <label for="days">Days:</label>
             <input type="number" id="days" placeholder="Enter days">
             <button class="travel-button" onclick="travelDays()">Travel Days</button>
@@ -52,7 +57,7 @@
         </div>
         <div>
             <label for="speed">Time Travel Speed:</label>
-            <input type="range" id="speed" min="0" max="100" value="1" onchange="updateSpeed()">
+            <input type="range" id="speed" min="0" max="100" value="1" oninput="updateSpeed()">
             <span id="speed-display">1x</span>
         </div>
         <div>
