@@ -54,8 +54,8 @@ function simulateTimeTravel(days) {
         return;
     }
 
-    // Calculate the chance of machine breaking based on speed
-    const breakChance = calculateBreakChance();
+    // Calculate probability of machine breaking based on speed
+    const breakChance = travelSpeed * 0.1; // Higher speed increases chance of breaking
     if (Math.random() < breakChance) {
         alert("The time machine has broken!");
         isMachineBroken = true;
@@ -143,11 +143,16 @@ function travelToDestination() {
         return;
     }
 
-    // Calculate the chance of machine breaking based on speed
-    const breakChance = calculateBreakChance();
+    // Calculate probability of machine breaking based on speed
+    const breakChance = travelSpeed * 0.1; // Higher speed increases chance of breaking
     if (Math.random() < breakChance) {
         alert("The time machine has broken!");
         isMachineBroken = true;
+        return;
+    }
+
+    if (Math.random() < 0.05) { // Lowered chance of time travel failure (5%)
+        alert("Time travel failed!");
         return;
     }
 
@@ -178,15 +183,10 @@ function warpAnimation() {
 }
 
 function updateSpeed() {
-    const selectedSpeed = parseFloat(document.getElementById('speed').value);
-    travelSpeed = selectedSpeed;
+    const speedInput = document.getElementById('speed');
+    travelSpeed = parseFloat(speedInput.value);
+    document.getElementById('speed-display').innerText = `${travelSpeed.toFixed(2)}x`;
     updateDisplay();
-}
-
-function calculateBreakChance() {
-    // Higher speeds increase the chance of machine breaking
-    // Adjust as necessary for desired gameplay balance
-    return Math.min(travelSpeed * 0.1, 0.2); // Maximum 20% chance
 }
 
 document.addEventListener("DOMContentLoaded", () => {
