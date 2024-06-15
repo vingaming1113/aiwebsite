@@ -24,6 +24,25 @@ body {
     to { opacity: 1; }
 }
 
+@keyframes warpEffect {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.5);
+        opacity: 0.5;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.warp-animation {
+    animation: warpEffect 2s ease-in-out;
+}
+
 h1 {
     margin-bottom: 20px;
 }
@@ -34,55 +53,55 @@ h1 {
     font-weight: bold;
     background: rgba(255, 255, 255, 0.1);
     padding: 10px;
-    border-radius: 10px;
-}
-
-#map {
-    height: 200px;
-    width: 100%;
-    margin-bottom: 20px;
-    border-radius: 10px;
-    overflow: hidden;
+    border-radius: 5px;
 }
 
 .control-panel {
     display: flex;
-    flex-direction: column;
-    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
 }
 
 .control-panel > div {
-    margin-bottom: 15px;
-    width: 100%;
+    display: flex;
+    align-items: center;
 }
 
-label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
+.control-panel label {
+    margin-right: 10px;
 }
 
-input {
-    width: calc(100% - 20px);
-    padding: 10px;
-    border: none;
-    border-radius: 5px;
-    margin-bottom: 10px;
-    font-size: 16px;
-}
-
-button.travel-button {
-    width: 100%;
-    padding: 10px;
-    border: none;
-    border-radius: 5px;
-    background: #2980b9;
-    color: #ecf0f1;
+.travel-button, .reset-button {
+    padding: 10px 20px;
     font-size: 16px;
     cursor: pointer;
-    transition: background 0.3s;
+    background-color: #3498db;
+    color: #ecf0f1;
+    border: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
 }
 
-button.travel-button:hover {
-    background: #3498db;
+.travel-button:hover, .reset-button:hover {
+    background-color: #2980b9;
+}
+
+#map {
+    height: 300px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+}
+
+.flash {
+    animation: flash 1s infinite;
+}
+
+@keyframes flash {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0;
+    }
 }
