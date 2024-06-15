@@ -70,7 +70,7 @@ h1 {
 }
 
 .control-panel label {
-    margin-right: 10px;
+    margin-bottom: 10px;
 }
 
 .travel-button, .reset-button {
@@ -95,16 +95,6 @@ h1 {
     border-radius: 10px;
 }
 
-#speed {
-    width: 100%;
-    margin: 10px 0;
-}
-
-#speed-value {
-    font-size: 18px;
-    margin-top: 5px;
-}
-
 .flash {
     animation: flash 1s infinite;
 }
@@ -116,4 +106,31 @@ h1 {
     50% {
         opacity: 0;
     }
+}
+
+#speed {
+    width: 100%;
+    margin-top: 10px;
+}
+
+#travel-log {
+    max-height: 150px;
+    overflow-y: auto;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 10px;
+    border-radius: 5px;
+    text-align: left;
+}
+
+#travel-log div {
+    margin-bottom: 5px;
+}
+
+#energy-level {
+    font-size: 18px;
+    margin-bottom: 20px;
+    font-weight: bold;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 10px;
+    border-radius: 5px;
 }
