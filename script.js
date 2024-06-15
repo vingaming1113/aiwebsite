@@ -130,6 +130,44 @@ function travelToSpecificDate() {
     }
 }
 
+function travelToDestination() {
+    const lat = parseFloat(document.getElementById('destination-lat').value);
+    const lng = parseFloat(document.getElementById('destination-lng').value);
+    
+    if (isNaN(lat) || isNaN(lng)) {
+        alert("Please enter valid latitude and longitude.");
+        return;
+    }
+
+    if (isMachineBroken) {
+        alert("The time machine is broken! Please reset it.");
+        return;
+    }
+
+    if (Math.random() < 0.05) { // 5% chance of time machine breaking
+        alert("The time machine has broken!");
+        isMachineBroken = true;
+        return;
+    }
+
+    if (Math.random() < 0.1) { // 10% chance of time travel failure
+        alert("Time travel failed!");
+        return;
+    }
+
+    warpAnimation(); // Trigger warp animation
+
+    setTimeout(() => {
+        const newLocation = [lat, lng];
+        map.setView(newLocation, 13);
+        marker.setLatLng(newLocation);
+        updateLocationDisplay(newLocation);
+
+        currentTime = new Date(); // Reset time to current time after arrival
+        updateDisplay();
+    }, 2000); // Delay to simulate time warp effect
+}
+
 function resetMachine() {
     isMachineBroken = false;
     alert("The time machine has been reset.");
