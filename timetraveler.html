@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Advanced Time Traveler</title>
+    <meta property="og:title" content="Advanced Time Traveler">
+    <meta property="og:description" content="Simulate time travel with this advanced time traveler tool. Experience realistic travel speeds and the possibility of machine failure.">
+    <meta property="og:image" content="https://example.com/preview-image.jpg">
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
 </head>
@@ -14,6 +17,8 @@
     <div id="map"></div>
     <div class="output" id="current-time"></div>
     <div class="output" id="current-location"></div>
+    <div class="output" id="energy-level">Energy Level: 100%</div>
+    <div class="output" id="travel-speed"></div>
     <div class="control-panel">
         <div>
             <label for="days">Days:</label>
@@ -49,13 +54,11 @@
         </div>
         <div>
             <label for="speed">Time Travel Speed:</label>
-            <input type="range" id="speed" min="0" max="100" value="1">
+            <input type="range" id="speed" min="0" max="100" step="1" value="1">
             <span id="speed-value">1x</span>
         </div>
         <div>
             <button class="travel-button" onclick="travelToRandomDate()">Random Date</button>
-        </div>
-        <div>
             <button class="travel-button" onclick="travelToPastEvent()">Past Event</button>
             <button class="travel-button" onclick="travelToFutureEvent()">Future Event</button>
         </div>
@@ -63,7 +66,7 @@
             <button class="reset-button" onclick="resetMachine()">Reset Machine</button>
         </div>
     </div>
-    <div class="output" id="travel-speed"></div>
+    <div class="output" id="travel-log"></div>
 </div>
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
