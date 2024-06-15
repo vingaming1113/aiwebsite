@@ -1,21 +1,20 @@
 let currentTime = new Date();
 let travelSpeed = 1; // Speed factor, could be adjusted for more dynamic simulations
 let map, marker;
+let isMachineBroken = false;
 
 function initMap() {
     navigator.geolocation.getCurrentPosition((position) => {
         const { latitude, longitude } = position.coords;
-        const userLocation = { lat: latitude, lng: longitude };
+        const userLocation = [latitude, longitude];
 
-        map = new google.maps.Map(document.getElementById('map'), {
-            center: userLocation,
-            zoom: 8
-        });
+        map = L.map('map').setView(userLocation, 13);
 
-        marker = new google.maps.Marker({
-            position: userLocation,
-            map: map
-        });
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        marker = L.marker(userLocation).addTo(map);
 
         updateLocationDisplay(userLocation);
     });
@@ -28,9 +27,9 @@ function updateDisplay() {
 }
 
 function updateLocationDisplay(location) {
-    document.getElementById('current-location').innerText = `Current location: Lat ${location.lat.toFixed(2)}, Lng ${location.lng.toFixed(2)}`;
-    marker.setPosition(location);
-    map.setCenter(location);
+    document.getElementById('current-location').innerText = `Current location: Lat ${location[0].toFixed(2)}, Lng ${location[1].toFixed(2)}`;
+    marker.setLatLng(location);
+    map.setView(location);
 }
 
 function addAnimation() {
@@ -40,6 +39,17 @@ function addAnimation() {
 }
 
 function simulateTimeTravel(days) {
+    if (isMachineBroken) {
+        alert("The time machine is broken! Please reset it.");
+        return;
+    }
+
+    if (Math.random() < 0.05) { // 5% chance of time machine breaking
+        alert("The time machine has broken!");
+        isMachineBroken = true;
+        return;
+    }
+
     if (Math.random() < 0.1) { // 10% chance of time travel failure
         alert("Time travel failed!");
         return;
@@ -52,10 +62,10 @@ function simulateTimeTravel(days) {
     updateDisplay();
 
     const randomShift = () => (Math.random() - 0.5) * 0.02; // Small random shift in location
-    const newLocation = {
-        lat: marker.getPosition().lat() + randomShift(),
-        lng: marker.getPosition().lng() + randomShift()
-    };
+    const newLocation = [
+        marker.getLatLng().lat + randomShift(),
+        marker.getLatLng().lng + randomShift()
+    ];
     updateLocationDisplay(newLocation);
 }
 
@@ -104,6 +114,11 @@ function travelToSpecificDate() {
     } else {
         alert("Please enter a valid date in YYYY-MM-DD format.");
     }
+}
+
+function resetMachine() {
+    isMachineBroken = false;
+    alert("The time machine has been reset.");
 }
 
 document.addEventListener("DOMContentLoaded", () => {
