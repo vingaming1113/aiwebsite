@@ -4,25 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Advanced Time Traveler</title>
-    <meta property="og:title" content="Advanced Time Traveler">
-    <meta property="og:description" content="Simulate time travel with this advanced time traveler tool. Experience realistic travel speeds and the possibility of machine failure.">
-    <meta property="og:image" content="https://example.com/preview-image.jpg">
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
 </head>
 <body>
 
 <div id="container">
-    <h1>Time Traveler</h1>
+    <h1>Advanced Time Traveler</h1>
     <div id="map"></div>
     <div class="output" id="current-time"></div>
     <div class="output" id="current-location"></div>
     <div class="control-panel">
-        <div>
-            <label for="seconds">Seconds:</label>
-            <input type="number" id="seconds" placeholder="Enter seconds">
-            <button class="travel-button" onclick="travelSeconds()">Travel Seconds</button>
-        </div>
         <div>
             <label for="days">Days:</label>
             <input type="number" id="days" placeholder="Enter days">
@@ -57,8 +49,15 @@
         </div>
         <div>
             <label for="speed">Time Travel Speed:</label>
-            <input type="range" id="speed" min="0" max="100" value="1" oninput="updateSpeed()">
-            <span id="speed-display">1x</span>
+            <input type="range" id="speed" min="0" max="100" value="1">
+            <span id="speed-value">1x</span>
+        </div>
+        <div>
+            <button class="travel-button" onclick="travelToRandomDate()">Random Date</button>
+        </div>
+        <div>
+            <button class="travel-button" onclick="travelToPastEvent()">Past Event</button>
+            <button class="travel-button" onclick="travelToFutureEvent()">Future Event</button>
         </div>
         <div>
             <button class="reset-button" onclick="resetMachine()">Reset Machine</button>
