@@ -1,7 +1,6 @@
 let currentTime = new Date();
 let travelSpeed = 1; // Speed factor, could be adjusted for more dynamic simulations
 let map, marker;
-let isMachineBroken = false;
 
 function initMap() {
     navigator.geolocation.getCurrentPosition((position) => {
@@ -39,17 +38,6 @@ function addAnimation() {
 }
 
 function simulateTimeTravel(days) {
-    if (isMachineBroken) {
-        alert("The time machine is broken! Please reset it.");
-        return;
-    }
-
-    if (Math.random() < 0.05) { // 5% chance of time machine breaking
-        alert("The time machine has broken!");
-        isMachineBroken = true;
-        return;
-    }
-
     if (Math.random() < 0.1) { // 10% chance of time travel failure
         alert("Time travel failed!");
         return;
@@ -114,11 +102,6 @@ function travelToSpecificDate() {
     } else {
         alert("Please enter a valid date in YYYY-MM-DD format.");
     }
-}
-
-function resetMachine() {
-    isMachineBroken = false;
-    alert("The time machine has been reset.");
 }
 
 document.addEventListener("DOMContentLoaded", () => {
