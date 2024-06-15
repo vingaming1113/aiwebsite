@@ -4,7 +4,7 @@ let map, marker;
 let isMachineBroken = false;
 
 function initMap() {
-    map = L.map('map').setView([0, 0], 3); // Increased initial zoom level
+    map = L.map('map').setView([0, 0], 3); // Initial view centered at (0, 0) with zoom level 3
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -18,9 +18,9 @@ function initMap() {
         navigator.geolocation.getCurrentPosition((position) => {
             const { latitude, longitude } = position.coords;
             const userLocation = [latitude, longitude];
-            map.setView(userLocation, 13);
-            marker.setLatLng(userLocation);
-            updateLocationDisplay(userLocation);
+            map.setView(userLocation, 13); // Set map view to user's location with zoom level 13
+            marker.setLatLng(userLocation); // Set marker at user's location
+            updateLocationDisplay(userLocation); // Update location display
         }, () => {
             // Handle geolocation error
             alert('Error: The Geolocation service failed.');
@@ -91,44 +91,6 @@ function travelDays() {
     }
 }
 
-function travelWeeks() {
-    const weeks = parseInt(document.getElementById('weeks').value);
-    if (!isNaN(weeks)) {
-        simulateTimeTravel(weeks * 7);
-    } else {
-        alert("Please enter a valid number of weeks.");
-    }
-}
-
-function travelMonths() {
-    const months = parseInt(document.getElementById('months').value);
-    if (!isNaN(months)) {
-        simulateTimeTravel(months * 30);
-    } else {
-        alert("Please enter a valid number of months.");
-    }
-}
-
-function travelYears() {
-    const years = parseInt(document.getElementById('years').value);
-    if (!isNaN(years)) {
-        simulateTimeTravel(years * 365);
-    } else {
-        alert("Please enter a valid number of years.");
-    }
-}
-
-function travelToSpecificDate() {
-    const dateStr = document.getElementById('specific-date').value;
-    const date = new Date(dateStr);
-    if (!isNaN(date.getTime())) {
-        currentTime = date;
-        updateDisplay();
-    } else {
-        alert("Please enter a valid date in YYYY-MM-DD format.");
-    }
-}
-
 function travelToDestination() {
     const lat = parseFloat(document.getElementById('destination-lat').value);
     const lng = parseFloat(document.getElementById('destination-lng').value);
@@ -160,8 +122,8 @@ function travelToDestination() {
 
     setTimeout(() => {
         const newLocation = [lat, lng];
-        map.setView(newLocation, 13);
-        marker.setLatLng(newLocation);
+        map.setView(newLocation, 13); // Set map view to new location with zoom level 13
+        marker.setLatLng(newLocation); // Move marker to new location
         updateLocationDisplay(newLocation);
 
         currentTime = new Date(); // Reset time to current time after arrival
