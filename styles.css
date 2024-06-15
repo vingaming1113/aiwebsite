@@ -1,3 +1,4 @@
+/* Global styles */
 body {
     font-family: 'Roboto', sans-serif;
     background: linear-gradient(to bottom right, #2c3e50, #3498db);
@@ -24,29 +25,14 @@ body {
     to { opacity: 1; }
 }
 
-@keyframes warpEffect {
-    0% {
-        transform: scale(1);
-        opacity: 1;
-    }
-    50% {
-        transform: scale(1.5);
-        opacity: 0.5;
-    }
-    100% {
-        transform: scale(1);
-        opacity: 1;
-    }
-}
-
-.warp-animation {
-    animation: warpEffect 2s ease-in-out;
-}
-
-h1 {
+/* Map styles */
+#map {
+    height: 300px;
     margin-bottom: 20px;
+    border-radius: 10px;
 }
 
+/* Output display styles */
 .output {
     font-size: 18px;
     margin-bottom: 20px;
@@ -56,6 +42,7 @@ h1 {
     border-radius: 5px;
 }
 
+/* Control panel styles */
 .control-panel {
     display: flex;
     flex-wrap: wrap;
@@ -72,6 +59,7 @@ h1 {
     margin-right: 10px;
 }
 
+/* Button styles */
 .travel-button, .reset-button {
     padding: 10px 20px;
     font-size: 16px;
@@ -87,12 +75,27 @@ h1 {
     background-color: #2980b9;
 }
 
-#map {
-    height: 300px;
-    margin-bottom: 20px;
-    border-radius: 10px;
+/* Animation effect styles */
+.warp-animation {
+    animation: warpEffect 2s ease-in-out;
 }
 
+@keyframes warpEffect {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.5);
+        opacity: 0.5;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Flash animation for time display */
 .flash {
     animation: flash 1s infinite;
 }
@@ -106,20 +109,18 @@ h1 {
     }
 }
 
-.speed-selector {
-    margin-top: 20px;
-}
-
+/* Speed selector styles */
 #speed {
+    width: 200px;
     -webkit-appearance: none;
     appearance: none;
-    width: 100%;
     height: 10px;
-    background: #bdc3c7;
-    border-radius: 5px;
+    background: #d3d3d3;
     outline: none;
     opacity: 0.7;
-    transition: opacity 0.2s;
+    transition: opacity .15s ease-in-out;
+    border-radius: 5px;
+    margin-top: 10px;
 }
 
 #speed:hover {
@@ -132,20 +133,24 @@ h1 {
     width: 20px;
     height: 20px;
     background: #3498db;
-    border-radius: 50%;
     cursor: pointer;
+    border-radius: 50%;
 }
 
 #speed::-moz-range-thumb {
     width: 20px;
     height: 20px;
     background: #3498db;
-    border-radius: 50%;
     cursor: pointer;
+    border-radius: 50%;
 }
 
-#speed-display {
-    display: inline-block;
-    margin-left: 10px;
-    font-weight: bold;
+/* Additional styles for specific elements */
+
+/* Ensure proper layout for smaller screens */
+@media (max-width: 600px) {
+    #container {
+        width: 90%;
+    }
 }
+
