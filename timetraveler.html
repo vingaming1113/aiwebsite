@@ -52,25 +52,25 @@
         </div>
         <div>
             <label for="speed">Time Travel Speed:</label>
-            <select id="speed">
-                <option value="1">Normal Speed</option>
-                <option value="2">Double Speed</option>
-                <option value="3">Triple Speed</option>
-            </select>
+            <input type="range" id="speed" min="0" max="3" step="0.5" value="1" onchange="updateSpeed()">
+            <div id="speedometer">
+                <div id="speedometer-needle"></div>
+                <div id="speedometer-labels">
+                    <span>0</span>
+                    <span>0.5</span>
+                    <span>1</span>
+                    <span>1.5</span>
+                    <span>2</span>
+                    <span>2.5</span>
+                    <span>3</span>
+                </div>
+            </div>
         </div>
         <div>
             <button class="reset-button" onclick="resetMachine()">Reset Machine</button>
         </div>
     </div>
     <div class="output" id="travel-speed"></div>
-
-    <!-- Speedometer display -->
-    <div class="speedometer">
-        <div class="meter">
-            <div id="speedometer-needle"></div>
-        </div>
-        <div id="speedometer-value"></div>
-    </div>
 </div>
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
