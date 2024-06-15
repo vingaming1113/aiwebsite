@@ -1,4 +1,3 @@
-/* Global styles */
 body {
     font-family: 'Roboto', sans-serif;
     background: linear-gradient(to bottom right, #2c3e50, #3498db);
@@ -10,7 +9,6 @@ body {
     margin: 0;
 }
 
-/* Container styles */
 #container {
     background: rgba(44, 62, 80, 0.9);
     padding: 20px;
@@ -24,80 +22,6 @@ body {
 @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
-}
-
-/* Header styles */
-h1 {
-    margin-bottom: 20px;
-}
-
-/* Output styles */
-.output {
-    font-size: 18px;
-    margin-bottom: 20px;
-    font-weight: bold;
-    background: rgba(255, 255, 255, 0.1);
-    padding: 10px;
-    border-radius: 5px;
-}
-
-/* Control panel styles */
-.control-panel {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 20px;
-}
-
-.control-panel > div {
-    display: flex;
-    align-items: center;
-}
-
-.control-panel label {
-    margin-right: 10px;
-}
-
-/* Travel button styles */
-.travel-button, .reset-button {
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    background-color: #3498db;
-    color: #ecf0f1;
-    border: none;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
-}
-
-.travel-button:hover, .reset-button:hover {
-    background-color: #2980b9;
-}
-
-/* Map styles */
-#map {
-    height: 300px;
-    margin-bottom: 20px;
-    border-radius: 10px;
-}
-
-/* Flash animation */
-.flash {
-    animation: flash 1s infinite;
-}
-
-@keyframes flash {
-    0%, 100% {
-        opacity: 1;
-    }
-    50% {
-        opacity: 0;
-    }
-}
-
-/* Warp animation */
-.warp-animation {
-    animation: warpEffect 2s ease-in-out;
 }
 
 @keyframes warpEffect {
@@ -115,69 +39,113 @@ h1 {
     }
 }
 
-/* Speedometer styles */
-#speed {
-    width: 100%;
+.warp-animation {
+    animation: warpEffect 2s ease-in-out;
 }
 
-#speedometer {
-    position: relative;
-    width: 100%;
-    height: 50px;
-    margin-top: 10px;
-    background-color: rgba(255, 255, 255, 0.1);
-    border-radius: 5px;
-    overflow: hidden;
+h1 {
+    margin-bottom: 20px;
 }
 
-#speedometer-needle {
-    position: absolute;
-    top: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 2px;
-    height: 50px;
-    background-color: #e74c3c;
-    z-index: 2;
-}
-
-#speedometer-labels {
-    display: flex;
-    justify-content: space-between;
-    position: relative;
-    z-index: 1;
-    height: 100%;
-    padding: 0 10px;
-    box-sizing: border-box;
-}
-
-#speedometer-labels span {
-    position: relative;
-    color: #ecf0f1;
-    font-size: 12px;
+.output {
+    font-size: 18px;
+    margin-bottom: 20px;
     font-weight: bold;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 10px;
+    border-radius: 5px;
 }
 
-#speedometer-labels span::before {
-    content: '';
-    position: absolute;
-    top: -10px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 2px;
+.control-panel {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+}
+
+.control-panel > div {
+    display: flex;
+    align-items: center;
+}
+
+.control-panel label {
+    margin-right: 10px;
+}
+
+.travel-button, .reset-button {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: #3498db;
+    color: #ecf0f1;
+    border: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.travel-button:hover, .reset-button:hover {
+    background-color: #2980b9;
+}
+
+#map {
+    height: 300px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+}
+
+.flash {
+    animation: flash 1s infinite;
+}
+
+@keyframes flash {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0;
+    }
+}
+
+.speed-selector {
+    margin-top: 20px;
+}
+
+#speed {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
     height: 10px;
-    background-color: #ecf0f1;
+    background: #bdc3c7;
+    border-radius: 5px;
+    outline: none;
+    opacity: 0.7;
+    transition: opacity 0.2s;
 }
 
-/* Additional styles for specific elements */
-#current-time {
-    font-size: 20px;
+#speed:hover {
+    opacity: 1;
 }
 
-#current-location {
-    font-size: 16px;
+#speed::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: #3498db;
+    border-radius: 50%;
+    cursor: pointer;
 }
 
-#travel-speed {
-    font-size: 16px;
+#speed::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background: #3498db;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+#speed-display {
+    display: inline-block;
+    margin-left: 10px;
+    font-weight: bold;
 }
