@@ -4,7 +4,7 @@ let map, marker;
 let isMachineBroken = false;
 
 function initMap() {
-    map = L.map('map').setView([0, 0], 2);
+    map = L.map('map').setView([0, 0], 3); // Increased initial zoom level
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -54,18 +54,19 @@ function simulateTimeTravel(days) {
         return;
     }
 
-    if (Math.random() < 0.05) { // 5% chance of time machine breaking
+    if (Math.random() < 0.02) { // Lowered chance of machine breaking (2%)
         alert("The time machine has broken!");
         isMachineBroken = true;
         return;
     }
 
-    if (Math.random() < 0.1) { // 10% chance of time travel failure
+    if (Math.random() < 0.05) { // Lowered chance of time travel failure (5%)
         alert("Time travel failed!");
         return;
     }
 
-    const speedFactor = Math.random() * 2 + 1; // Random speed factor between 1 and 3
+    const selectedSpeed = document.getElementById('speed').value;
+    const speedFactor = parseFloat(selectedSpeed);
     travelSpeed = speedFactor.toFixed(2);
 
     warpAnimation(); // Trigger warp animation
@@ -144,16 +145,20 @@ function travelToDestination() {
         return;
     }
 
-    if (Math.random() < 0.05) { // 5% chance of time machine breaking
+    if (Math.random() < 0.02) { // Lowered chance of machine breaking (2%)
         alert("The time machine has broken!");
         isMachineBroken = true;
         return;
     }
 
-    if (Math.random() < 0.1) { // 10% chance of time travel failure
+    if (Math.random() < 0.05) { // Lowered chance of time travel failure (5%)
         alert("Time travel failed!");
         return;
     }
+
+    const selectedSpeed = document.getElementById('speed').value;
+    const speedFactor = parseFloat(selectedSpeed);
+    travelSpeed = speedFactor.toFixed(2);
 
     warpAnimation(); // Trigger warp animation
 
