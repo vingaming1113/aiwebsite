@@ -15,7 +15,7 @@ body {
     border-radius: 15px;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
     text-align: center;
-    width: 800px; /* Increased width to accommodate more controls */
+    width: 600px;
     animation: fadeIn 2s ease-in-out;
 }
 
@@ -66,6 +66,7 @@ h1 {
 .control-panel > div {
     display: flex;
     align-items: center;
+    flex-direction: column;
 }
 
 .control-panel label {
@@ -81,6 +82,7 @@ h1 {
     border: none;
     border-radius: 5px;
     transition: background-color 0.3s ease;
+    margin-top: 10px;
 }
 
 .travel-button:hover, .reset-button:hover {
@@ -94,12 +96,13 @@ h1 {
 }
 
 #speed {
-    width: 100%; /* Full width for the range input */
+    width: 100%;
+    margin: 10px 0;
 }
 
 #speed-value {
-    margin-left: 10px;
-    font-weight: bold;
+    font-size: 18px;
+    margin-top: 5px;
 }
 
 .flash {
