@@ -1,0 +1,885 @@
+<html><head><base href="https://websimcreationengine.com/phone-simulator/"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Ultimate Phone Simulator with Custom Components</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #1a1a1a;
+        color: #e0e0e0;
+        margin: 0;
+        padding: 20px;
+    }
+    .container {
+        max-width: 800px;
+        margin: 0 auto;
+        background-color: #2a2a2a;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    }
+    h1, h2, h3 {
+        color: #ffffff;
+        text-align: center;
+    }
+    .phone-display {
+        width: 300px;
+        height: 600px;
+        margin: 20px auto;
+        position: relative;
+        overflow: hidden;
+    }
+    .phone-image {
+        width: 100%;
+        height: 100%;
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+    }
+    .phone-screen {
+        position: absolute;
+        top: 10%;
+        left: 10%;
+        width: 80%;
+        height: 75%;
+        background-color: rgba(0, 0, 0, 0.8);
+        color: #fff;
+        font-size: 14px;
+        padding: 10px;
+        box-sizing: border-box;
+        overflow-y: auto;
+        border-radius: 20px;
+    }
+    .form-group {
+        margin-bottom: 15px;
+    }
+    label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
+    input[type="text"], input[type="number"], select {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #444;
+        border-radius: 4px;
+        background-color: #333;
+        color: #e0e0e0;
+    }
+    button {
+        background-color: #4CAF50;
+        color: white;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-right: 10px;
+    }
+    button:hover {
+        background-color: #45a049;
+    }
+    .update-section, .custom-component-section {
+        margin-top: 20px;
+        padding: 15px;
+        background-color: #333;
+        border-radius: 5px;
+    }
+    .level-container {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+    .level-container label {
+        flex: 1;
+        margin-right: 10px;
+    }
+    .level-container input {
+        flex: 0 0 60px;
+        text-align: center;
+    }
+    .spec-input {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+    .spec-input label {
+        flex: 1;
+        margin-right: 10px;
+    }
+    .spec-input input {
+        flex: 2;
+    }
+    .camera-container {
+        border: 1px solid #444;
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+    }
+    .slider-container {
+        width: 100%;
+        height: 40px;
+        background-color: #444;
+        position: relative;
+        border-radius: 20px;
+        margin-bottom: 20px;
+    }
+    .slider-dot {
+        width: 30px;
+        height: 30px;
+        background-color: #4CAF50;
+        border-radius: 50%;
+        position: absolute;
+        top: 5px;
+        left: 0;
+        cursor: pointer;
+        transition: left 0.1s ease-in-out;
+    }
+    .slider-labels {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 5px;
+    }
+    .hard-drive-container {
+        border: 1px solid #444;
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+    }
+    #compatibleDevices {
+        width: 100%;
+        height: 100px;
+        resize: vertical;
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>Ultimate Phone Simulator with Custom Components</h1>
+    <div class="phone-display">
+        <div class="phone-image" id="phoneImage"></div>
+        <div class="phone-screen" id="phoneScreen">Your Custom Phone</div>
+    </div>
+    <form id="phoneForm">
+        <div class="form-group">
+            <label for="phoneName">Phone Name:</label>
+            <input type="text" id="phoneName" required>
+        </div>
+        <div class="form-group">
+            <label for="phoneStyle">Phone Style:</label>
+            <select id="phoneStyle">
+                <option value="old">Old</option>
+                <option value="classic">Classic</option>
+                <option value="modern">Modern</option>
+                <option value="fold">Fold</option>
+                <option value="flip">Flip</option>
+                <option value="xiaomi_redmi_11">Xiaomi Redmi 11</option>
+                <option value="samsung_galaxy_s22">Samsung Galaxy S22</option>
+                <option value="infinix_hot_40">Infinix Hot 40</option>
+                <option value="xiaomi_12t_pro">Xiaomi 12T Pro</option>
+                <option value="xiaomi_redmi_9">Xiaomi Redmi 9</option>
+                <option value="iphone_13_pro">iPhone 13 Pro</option>
+                <option value="iphone_13_pro_max">iPhone 13 Pro Max</option>
+                <option value="iphone_14_pro_max">iPhone 14 Pro Max</option>
+                <option value="iphone_15_pro">iPhone 15 Pro</option>
+                <option value="iphone_11_pro">iPhone 11 Pro</option>
+                <option value="iphone_12_mini">iPhone 12 mini</option>
+                <option value="iphone_11_pro_max">iPhone 11 Pro Max</option>
+                <option value="iphone_12_max">iPhone 12 Max</option>
+                <option value="xiaomi_14_ultra">Xiaomi 14 Ultra</option>
+                <option value="xiaomi_14_pro">Xiaomi 14 Pro</option>
+                <option value="xiaomi_13t_pro">Xiaomi 13T Pro</option>
+                <option value="xiaomi_mi_10t_pro">Xiaomi Mi 10T Pro</option>
+                <option value="xiaomi_mi_10">Xiaomi Mi 10</option>
+                <option value="xiaomi_mi_9s">Xiaomi Mi 9S</option>
+                <option value="xiaomi_redmi_note_12_discovery">Xiaomi Redmi Note 12 Discovery Edition</option>
+                <option value="xiaomi_redmi_note_13_pro_plus">Xiaomi Redmi Note 13 Pro Plus</option>
+                <option value="xiaomi_redmi_note_12s">Xiaomi Redmi Note 12S</option>
+                <option value="xiaomi_13">Xiaomi 13</option>
+                <option value="xiaomi_14">Xiaomi 14</option>
+                <option value="xiaomi_13_pro">Xiaomi 13 Pro</option>
+                <option value="oneplus_nord_n20_5g">OnePlus Nord N20 5G</option>
+                <option value="oneplus_12r">OnePlus 12R</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="os">Operating System:</label>
+            <select id="os">
+                <option value="android_4_1">Android 4.1</option>
+                <option value="android_5_1">Android 5.1</option>
+                <option value="android_6_0">Android 6.0</option>
+                <option value="android_7_0">Android 7.0</option>
+                <option value="android_7_1">Android 7.1</option>
+                <option value="android_8_0">Android 8.0</option>
+                <option value="android_8_1">Android 8.1</option>
+                <option value="android_9_0">Android 9.0</option>
+                <option value="android_10_0">Android 10.0</option>
+                <option value="android_11_0">Android 11.0</option>
+                <option value="android_12_0">Android 12.0</option>
+                <option value="android_12l">Android 12L</option>
+                <option value="android_13_0">Android 13.0</option>
+                <option value="android_14_0">Android 14.0</option>
+                <option value="android_15_0_beta">Android 15.0 (Beta)</option>
+                <option value="android_15_0_stable">Android 15.0 (Stable)</option>
+                <option value="ios_11_0">iOS 11.0</option>
+                <option value="ios_12_1">iOS 12.1</option>
+                <option value="ios_13_4">iOS 13.4</option>
+                <option value="ios_14_0">iOS 14.0</option>
+                <option value="ios_15_2">iOS 15.2</option>
+                <option value="ios_16_6">iOS 16.6</option>
+                <option value="ios_17_5_1">iOS 17.5.1</option>
+                <option value="ios_18_beta">iOS 18 Beta</option>
+                <option value="ios_18_1_beta">iOS 18.1 Beta</option>
+                <option value="miui_14_android_13">MIUI 14 Android 13.0</option>
+                <option value="miui_14_android_12">MIUI 14 Android 12.0</option>
+                <option value="miui_13_android_12">MIUI 13 Android 12.0</option>
+                <option value="miui_13_android_11">MIUI 13 Android 11.0</option>
+                <option value="miui_12_5_android_11">MIUI 12.5 Android 11.0</option>
+                <option value="miui_12_android_10">MIUI 12 Android 10.0</option>
+                <option value="miui_11_android_9">MIUI 11 Android 9.0</option>
+                <option value="hyperos_1_0_android_14">Xiaomi HyperOS 1.0 Android 14.0</option>
+                <option value="hyperos_1_5_android_14">Xiaomi HyperOS 1.5 Android 14.0</option>
+                <option value="hyperos_android_15_stable">Xiaomi HyperOS Android 15.0 (Stable)</option>
+                <option value="xiaomieu_hyperos_1_0_android_14">xiaomi.eu HyperOS 1.0 Android 14.0</option>
+                <option value="xiaomieu_miui_14_android_13">xiaomi.eu MIUI 14 Android 13.0</option>
+                <option value="xiaomieu_miui_13_android_12">xiaomi.eu MIUI 13 Android 12.0</option>
+                <option value="xiaomieu_miui_12_5_android_11">xiaomi.eu MIUI 12.5 Android 11.0</option>
+                <option value="oneui_6_1">OneUI 6.1</option>
+                <option value="oneui_6_0">OneUI 6.0</option>
+                <option value="oneui_5_1">OneUI 5.1</option>
+                <option value="oneui_5_0">OneUI 5.0</option>
+                <option value="oneui_4_1">OneUI 4.1</option>
+                <option value="oneui_4_0">OneUI 4.0</option>
+                <option value="symbianos_10_1">SymbianOS 10.1</option>
+                <option value="symbianos_9_5">SymbianOS 9.5</option>
+                <option value="symbianos_9_4">Symbian OS 9.4</option>
+                <option value="symbianos_8_0">SymbianOS 8.0</option>
+                <option value="pocketpc_2000">PocketPC 2000 OS</option>
+                <option value="pocketpc_2002">PocketPC 2002 OS</option>
+                <option value="windows_mobile_2003">Windows Mobile 2003 OS</option>
+                <option value="windows_mobile_2003_se">Windows Mobile 2003 SE OS</option>
+                <option value="windows_mobile_5_0">Windows Mobile 5.0 OS</option>
+                <option value="windows_mobile_6_0">Windows Mobile 6.0 OS</option>
+                <option value="windows_mobile_6_1">Windows Mobile 6.1 OS</option>
+                <option value="windows_mobile_6_5">Windows Mobile 6.5 OS</option>
+                <option value="windows_phone_7">Windows Phone 7 OS</option>
+                <option value="windows_phone_7_5">Windows Phone 7.5 OS</option>
+                <option value="windows_phone_7_8">Windows Phone 7.8 OS</option>
+                <option value="windows_phone_8_0">Windows Phone 8.0 OS</option>
+                <option value="windows_phone_8_1">Windows Phone 8.1 OS</option>
+                <option value="windows_10_mobile">Windows 10 Mobile Edition OS</option>
+                <option value="harmonyos_2_0">HarmonyOS 2.0</option>
+                <option value="harmonyos_3_0">HarmonyOS 3.0</option>
+                <option value="harmonyos_4_0">HarmonyOS 4.0</option>
+                <option value="coloros_7_0">ColorOS 7.0</option>
+                <option value="coloros_7_1">ColorOS 7.1</option>
+                <option value="coloros_7_2">ColorOS 7.2</option>
+                <option value="coloros_11_2">ColorOS 11.2</option>
+                <option value="coloros_12_0">ColorOS 12.0</option>
+                <option value="coloros_14_1">ColorOS 14.1</option>
+                <option value="oxygenos_12_0">OxygenOS 12.0</option>
+                <option value="oxygenos_11_1">OxygenOS 11.1</option>
+                <option value="oxygenos_14_0">OxygenOS 14.0</option>
+                <option value="crdroid_10_7">crDroid 10.7</option>
+                <option value="emui_12_0">EMUI 12.0</option>
+                <option value="emui_13_1">EMUI 13.1</option>
+                <option value="emui_14_1">EMUI 14.1</option>
+                <option value="emui_14_2">EMUI 14.2</option>
+                <option value="miui_10_android_8_1">MIUI 10 Android 8.1</option>
+                <option value="miui_9_android_7_1">MIUI 9 Android 7.1</option>
+                <option value="miui_6_android_5_0_2">MIUI 6 Android 5.0.2</option>
+                <option value="android_5_0_2">Android 5.0.2</option>
+                <option value="custom">Custom OS</option>
+            </select>
+        </div>
+        
+        <!-- Camera Section -->
+        <div class="form-group">
+            <label>Number of Back Cameras (1-6):</label>
+            <div class="slider-container" id="backCameraSlider">
+                <div class="slider-dot" id="backCameraDot"></div>
+            </div>
+            <div class="slider-labels">
+                <span>1</span>
+                <span>2</span>
+                <span>3</span>
+                <span>4</span>
+                <span>5</span>
+                <span>6</span>
+            </div>
+        </div>
+        <div id="backCameraContainer"></div>
+        
+        <div class="form-group">
+            <label>Number of Front Cameras (1-2):</label>
+            <div class="slider-container" id="frontCameraSlider">
+                <div class="slider-dot" id="frontCameraDot"></div>
+            </div>
+            <div class="slider-labels">
+                <span>1</span>
+                <span>2</span>
+            </div>
+        </div>
+        <div id="frontCameraContainer"></div>
+
+        <div class="form-group">
+            <label for="screenRes">Screen Resolution:</label>
+            <input type="text" id="screenRes" placeholder="e.g. 1920x1080">
+        </div>
+        <div class="form-group">
+            <label for="screenType">Screen Type:</label>
+            <select id="screenType">
+                <option value="lcd">LCD</option>
+                <option value="oled">OLED</option>
+                <option value="amoled">AMOLED</option>
+                <option value="poled">POLED</option>
+                <option value="tn">TN</option>
+                <option value="va">VA</option>
+                <option value="ips">IPS</option>
+                <option value="microled">MicroLED</option>
+                <option value="qd-oled">QD-OLED</option>
+                <option value="miniled">MiniLED</option>
+                <option value="ultraled">UltraLED</option>
+                <option value="hgb">HGB</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="ram">RAM (GB):</label>
+            <input type="number" id="ram" min="1" max="32" value="4">
+        </div>
+        <div class="form-group">
+            <label for="hardDriveCount">Number of Hard Drives:</label>
+            <select id="hardDriveCount">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+            </select>
+        </div>
+        <div id="hardDriveContainer"></div>
+        <div class="form-group">
+            <label for="supportsMicroSD">Supports MicroSD:</label>
+            <select id="supportsMicroSD">
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+            </select>
+        </div>
+        <div class="form-group" id="microSDMaxSizeGroup" style="display: none;">
+            <label for="microSDMaxSize">Max MicroSD Size (GB):</label>
+            <input type="number" id="microSDMaxSize" min="32" max="2048" value="512">
+        </div>
+        <div class="form-group">
+            <label for="supportsDualSIM">Supports Dual SIM:</label>
+            <select id="supportsDualSIM">
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="phonePrice">Phone Price ($):</label>
+            <input type="number" id="phonePrice" min="0" step="0.01" value="999.99">
+        </div>
+        
+        <!-- CPU Selection -->
+        <div class="form-group">
+            <label for="cpuChoice">CPU Choice:</label>
+            <select id="cpuChoice">
+                <option value="existing">Use Existing CPU</option>
+                <option value="custom">Create Custom CPU</option>
+            </select>
+        </div>
+        <div id="existingCPUSection">
+            <div class="form-group">
+                <label for="existingCPU">Select Existing CPU:</label>
+                <select id="existingCPU">
+                    <option value="dimensity9300plus">Dimensity 9300 Plus</option>
+                    <option value="dimensity9300">Dimensity 9300</option>
+                    <option value="snapdragon8gen3">Snapdragon 8 Gen 3</option>
+                    <option value="a17pro">A17 Pro</option>
+                    <option value="a16bionic">A16 Bionic</option>
+                    <option value="exynos2400">Exynos 2400</option>
+                    <option value="snapdragon8gen2">Snapdragon 8 Gen 2</option>
+                    <option value="dimensity9200">Dimensity 9200</option>
+                    <option value="tensorg4">Tensor G4</option>
+                    <option value="tensorg3">Tensor G3</option>
+                    <option value="snapdragon7plusgen2">Snapdragon 7 Plus Gen 2</option>
+                    <option value="kirin9010">Kirin 9010</option>
+                    <option value="kirin9000s">Kirin 9000S</option>
+                    <option value="snapdragon888">Snapdragon 888</option>
+                    <option value="dimensity8200">Dimensity 8200</option>
+                    <option value="snapdragon782g">Snapdragon 782G</option>
+                    <option value="exynos1380">Exynos 1380</option>
+                </select>
+            </div>
+        </div>
+        <div id="customCPUSection" style="display:none;">
+            <h3>Custom CPU Specifications</h3>
+            <div class="spec-input">
+                <label for="cpuName">CPU Name:</label>
+                <input type="text" id="cpuName" placeholder="e.g. QuantumCore X1">
+            </div>
+            <div class="spec-input">
+                <label for="cpuCores">Number of Cores:</label>
+                <input type="number" id="cpuCores" min="1" value="8">
+            </div>
+            <div class="spec-input">
+                <label for="cpuFrequency">Base Frequency (GHz):</label>
+                <input type="number" id="cpuFrequency" min="0.1" step="0.1" value="2.5">
+            </div>
+            <div class="spec-input">
+                <label for="cpuTurboFrequency">Turbo Frequency (GHz):</label>
+                <input type="number" id="cpuTurboFrequency" min="0.1" step="0.1" value="3.5">
+            </div>
+            <div class="spec-input">
+                <label for="cpuCache">Cache Size (MB):</label>
+                <input type="number" id="cpuCache" min="1" value="16">
+            </div>
+            <div class="spec-input">
+                <label for="cpuArchitecture">Architecture:</label>
+                <input type="text" id="cpuArchitecture" placeholder="e.g. ARM v9">
+            </div>
+        </div>
+
+        <!-- GPU Selection -->
+        <div class="form-group">
+            <label for="gpuChoice">GPU Choice:</label>
+            <select id="gpuChoice">
+                <option value="existing">Use Existing GPU</option>
+                <option value="custom">Create Custom GPU</option>
+            </select>
+        </div>
+        <div id="existingGPUSection">
+            <div class="form-group">
+                <label for="existingGPU">Select Existing GPU:</label>
+                <select id="existingGPU">
+                    <option value="adreno750">Adreno 750</option>
+                    <option value="a17progpu">A17 Pro GPU</option>
+                    <option value="immortalisg925">Immortalis-G925</option>
+                    <option value="adreno740">Adreno 740</option>
+                    <option value="a16bionicgpu">A16 Bionic GPU</option>
+                    <option value="a15bionicgpu">A15 Bionic GPU</option>
+                    <option value="xclipse940">Xclipse 940</option>
+                    <option value="immortalisg715mp11">Immortalis-G715 MP11</option>
+                    <option value="adreno730">Adreno 730</option>
+                    <option value="malig710mc10">Mali-G710 MC10</option>
+                    <option value="xclipse920">Xclipse 920</option>
+                    <option value="adreno660">Adreno 660</option>
+                    <option value="adreno650">Adreno 650</option>
+                </select>
+            </div>
+        </div>
+        <div id="customGPUSection" style="display:none;">
+            <h3>Custom GPU Specifications</h3>
+            <div class="spec-input">
+                <label for="gpuName">GPU Name:</label>
+                <input type="text" id="gpuName" placeholder="e.g. HyperGraphics 4000">
+            </div>
+            <div class="spec-input">
+                <label for="gpuCores">Number of Cores:</label>
+                <input type="number" id="gpuCores" min="1" value="512">
+            </div>
+            <div class="spec-input">
+                <label for="gpuFrequency">Clock Speed (MHz):</label>
+                <input type="number" id="gpuFrequency" min="1" value="850">
+            </div>
+            <div class="spec-input">
+                <label for="gpuMemory">Memory Size (GB):</label>
+                <input type="number" id="gpuMemory" min="0.5" step="0.5" value="4">
+            </div>
+            <div class="spec-input">
+                <label for="gpuBandwidth">Memory Bandwidth (GB/s):</label>
+                <input type="number" id="gpuBandwidth" min="1" value="128">
+            </div>
+            <div class="spec-input">
+                <label for="gpuApi">Supported APIs:</label>
+                <input type="text" id="gpuApi" placeholder="e.g. Vulkan, OpenGL ES">
+            </div>
+        </div>
+
+        <div id="customOSSection" style="display:none;">
+            <h3>Custom OS Settings</h3>
+            <div class="form-group">
+                <label for="osName">OS Name:</label>
+                <input type="text" id="osName">
+            </div>
+            <div class="form-group">
+                <label for="osVersion">OS Version:</label>
+                <input type="text" id="osVersion" placeholder="e.g. 1.0">
+            </div>
+            <div class="form-group">
+                <label for="osFeatures">OS Features (comma-separated):</label>
+                <input type="text" id="osFeatures" placeholder="e.g. voice assistant, dark mode">
+            </div>
+            <div class="form-group">
+                <label for="osPrice">OS Price ($):</label>
+                <input type="number" id="osPrice" min="0" step="0.01" value="0">
+            </div>
+        </div>
+
+        <button type="submit">Create Phone</button>
+    </form>
+
+    <div class="update-section" id="updateSection">
+        <h2>OS Update</h2>
+        <div class="form-group">
+            <label for="updateOSName">OS Name:</label>
+            <input type="text" id="updateOSName">
+        </div>
+        <div class="form-group">
+            <label for="updateOSVersion">OS Version:</label>
+            <input type="text" id="updateOSVersion" placeholder="e.g. 1.0">
+        </div>
+        <div class="level-container">
+            <label for="accessibility">Accessibility:</label>
+            <input type="number" id="accessibility" min="1" max="999999" value="1">
+        </div>
+        <div class="level-container">
+            <label for="security">Security:</label>
+            <input type="number" id="security" min="1" max="999999" value="1">
+        </div>
+        <div class="level-container">
+            <label for="usability">Usability:</label>
+            <input type="number" id="usability" min="1" max="999999" value="1">
+        </div>
+        <div class="level-container">
+            <label for="optimization">Optimization:</label>
+            <input type="number" id="optimization" min="1" max="999999" value="1">
+        </div>
+        <div class="level-container">
+            <label for="appStore">App Store:</label>
+            <input type="number" id="appStore" min="1" max="999999" value="1">
+        </div>
+        <div class="level-container">
+            <label for="firmware">Firmware:</label>
+            <input type="number" id="firmware" min="1" max="999999" value="1">
+        </div>
+        <div class="form-group">
+            <label for="otherFeatures">Other Features:</label>
+            <input type="text" id="otherFeatures" placeholder="e.g. new UI, voice control">
+        </div>
+        <div class="form-group">
+            <label for="compatibilityRequirement">Compatibility Requirement:</label>
+            <select id="compatibilityRequirement">
+                <option value="none">No Compatibility Requirement</option>
+                <option value="specific">Specify Compatible Devices</option>
+            </select>
+        </div>
+        <div id="compatibleDevicesSection" style="display:none;">
+            <label for="compatibleDevices">Compatible Devices (one per line):</label>
+            <textarea id="compatibleDevices" placeholder="e.g.
+Xiaomi 12T Pro
+Samsung Galaxy S22
+iPhone 14 Pro"></textarea>
+        </div>
+        <button type="button" id="updateOS">Update OS</button>
+    </div>
+</div>
+
+<script>
+let phoneSpecs = {
+    phoneName: "Default Phone",
+    phoneStyle: "classic",
+    os: "android_12_0",
+    cameras: {
+        back: [{mpx: 12, gpx: 0, kpx: 0}],
+        front: [{mpx: 8, gpx: 0, kpx: 0}]
+    },
+    screenRes: "1920x1080",
+    screenType: "lcd",
+    cpu: "Snapdragon 8 Gen 3",
+    gpu: "Adreno 750",
+    ram: "4",
+    hardDrives: [{type: "ssd", capacity: 64}],
+    supportsMicroSD: "no",
+    microSDMaxSize: 512,
+    supportsDualSIM: "no",
+    price: 999.99
+};
+
+let osInfo = {
+    name: "AndroidOS",
+    version: "12.0",
+    accessibility: 1,
+    security: 1,
+    usability: 1,
+    optimization: 1,
+    appStore: 1,
+    firmware: 1,
+    otherFeatures: ""
+};
+
+function updatePhoneDisplay() {
+    const phoneScreen = document.getElementById('phoneScreen');
+    let specsHtml = `
+        <h2>${phoneSpecs.phoneName}</h2>
+        <p>Style: ${phoneSpecs.phoneStyle}</p>
+        <p>OS: ${phoneSpecs.os}</p>
+        <p>Screen: ${phoneSpecs.screenRes} ${phoneSpecs.screenType}</p>
+        <p>CPU: ${phoneSpecs.cpu}</p>
+        <p>GPU: ${phoneSpecs.gpu}</p>
+        <p>RAM: ${phoneSpecs.ram} GB</p>
+        <p>Storage:</p>
+        <ul>
+            ${phoneSpecs.hardDrives.map(drive => `<li>${drive.type.toUpperCase()}: ${drive.capacity} GB</li>`).join('')}
+        </ul>
+        <p>Cameras:</p>
+        <ul>
+            ${phoneSpecs.cameras.back.map((cam, index) => `<li>Back ${index + 1}: ${cam.mpx} MPx, ${cam.gpx} GPx, ${cam.kpx} KPx</li>`).join('')}
+            ${phoneSpecs.cameras.front.map((cam, index) => `<li>Front ${index + 1}: ${cam.mpx} MPx, ${cam.gpx} GPx, ${cam.kpx} KPx</li>`).join('')}
+        </ul>
+        <p>MicroSD Support: ${phoneSpecs.supportsMicroSD}</p>
+        ${phoneSpecs.supportsMicroSD === 'yes' ? `<p>Max MicroSD Size: ${phoneSpecs.microSDMaxSize} GB</p>` : ''}
+        <p>Dual SIM: ${phoneSpecs.supportsDualSIM}</p>
+        <p>Price: $${phoneSpecs.price}</p>
+    `;
+    phoneScreen.innerHTML = specsHtml;
+}
+
+document.getElementById('phoneForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    phoneSpecs.phoneName = document.getElementById('phoneName').value;
+    phoneSpecs.phoneStyle = document.getElementById('phoneStyle').value;
+    phoneSpecs.os = document.getElementById('os').value;
+    phoneSpecs.screenRes = document.getElementById('screenRes').value;
+    phoneSpecs.screenType = document.getElementById('screenType').value;
+    phoneSpecs.ram = document.getElementById('ram').value;
+    phoneSpecs.supportsMicroSD = document.getElementById('supportsMicroSD').value;
+    phoneSpecs.microSDMaxSize = document.getElementById('microSDMaxSize').value;
+    phoneSpecs.supportsDualSIM = document.getElementById('supportsDualSIM').value;
+    phoneSpecs.price = parseFloat(document.getElementById('phonePrice').value);
+
+    // Handle CPU selection
+    if (document.getElementById('cpuChoice').value === 'existing') {
+        phoneSpecs.cpu = document.getElementById('existingCPU').value;
+    } else {
+        phoneSpecs.cpu = {
+            name: document.getElementById('cpuName').value,
+            cores: parseInt(document.getElementById('cpuCores').value),
+            frequency: parseFloat(document.getElementById('cpuFrequency').value),
+            turboFrequency: parseFloat(document.getElementById('cpuTurboFrequency').value),
+            cache: parseInt(document.getElementById('cpuCache').value),
+            architecture: document.getElementById('cpuArchitecture').value
+        };
+    }
+
+    // Handle GPU selection
+    if (document.getElementById('gpuChoice').value === 'existing') {
+        phoneSpecs.gpu = document.getElementById('existingGPU').value;
+    } else {
+        phoneSpecs.gpu = {
+            name: document.getElementById('gpuName').value,
+            cores: parseInt(document.getElementById('gpuCores').value),
+            frequency: parseInt(document.getElementById('gpuFrequency').value),
+            memory: parseFloat(document.getElementById('gpuMemory').value),
+            bandwidth: parseInt(document.getElementById('gpuBandwidth').value),
+            api: document.getElementById('gpuApi').value
+        };
+    }
+
+    // Handle hard drives
+    const hardDriveCount = parseInt(document.getElementById('hardDriveCount').value);
+    phoneSpecs.hardDrives = [];
+    for (let i = 1; i <= hardDriveCount; i++) {
+        phoneSpecs.hardDrives.push({
+            type: document.getElementById(`hardDriveType${i}`).value,
+            capacity: parseInt(document.getElementById(`hardDriveCapacity${i}`).value)
+        });
+    }
+
+    // Handle cameras
+    const backCameraCount = parseInt(document.getElementById('backCameraSlider').getAttribute('data-value'));
+    const frontCameraCount = parseInt(document.getElementById('frontCameraSlider').getAttribute('data-value'));
+    
+    phoneSpecs.cameras.back = [];
+    for (let i = 1; i <= backCameraCount; i++) {
+        phoneSpecs.cameras.back.push({
+            mpx: parseInt(document.getElementById(`backCameraMPx${i}`).value),
+            gpx: parseInt(document.getElementById(`backCameraGPx${i}`).value),
+            kpx: parseInt(document.getElementById(`backCameraKPx${i}`).value)
+        });
+    }
+    
+    phoneSpecs.cameras.front = [];
+    for (let i = 1; i <= frontCameraCount; i++) {
+        phoneSpecs.cameras.front.push({
+            mpx: parseInt(document.getElementById(`frontCameraMPx${i}`).value),
+            gpx: parseInt(document.getElementById(`frontCameraGPx${i}`).value),
+            kpx: parseInt(document.getElementById(`frontCameraKPx${i}`).value)
+        });
+    }
+
+    updatePhoneDisplay();
+});
+
+document.getElementById('updateOS').addEventListener('click', function() {
+    osInfo.name = document.getElementById('updateOSName').value;
+    osInfo.version = document.getElementById('updateOSVersion').value;
+    osInfo.accessibility = parseInt(document.getElementById('accessibility').value);
+    osInfo.security = parseInt(document.getElementById('security').value);
+    osInfo.usability = parseInt(document.getElementById('usability').value);
+    osInfo.optimization = parseInt(document.getElementById('optimization').value);
+    osInfo.appStore = parseInt(document.getElementById('appStore').value);
+    osInfo.firmware = parseInt(document.getElementById('firmware').value);
+    osInfo.otherFeatures = document.getElementById('otherFeatures').value;
+
+    const compatibilityRequirement = document.getElementById('compatibilityRequirement').value;
+    const compatibleDevices = document.getElementById('compatibleDevices').value;
+
+    let updateMessage = `OS updated to ${osInfo.name} ${osInfo.version}`;
+    if (compatibilityRequirement === 'specific') {
+        updateMessage += ". Compatible with: " + compatibleDevices.split('\n').join(', ');
+    }
+    alert(updateMessage);
+});
+
+document.getElementById('supportsMicroSD').addEventListener('change', function() {
+    const microSDMaxSizeGroup = document.getElementById('microSDMaxSizeGroup');
+    microSDMaxSizeGroup.style.display = this.value === 'yes' ? 'block' : 'none';
+});
+
+document.getElementById('os').addEventListener('change', function() {
+    const customOSSection = document.getElementById('customOSSection');
+    customOSSection.style.display = this.value === 'custom' ? 'block' : 'none';
+});
+
+document.getElementById('cpuChoice').addEventListener('change', function() {
+    const existingCPUSection = document.getElementById('existingCPUSection');
+    const customCPUSection = document.getElementById('customCPUSection');
+    if (this.value === 'existing') {
+        existingCPUSection.style.display = 'block';
+        customCPUSection.style.display = 'none';
+    } else {
+        existingCPUSection.style.display = 'none';
+        customCPUSection.style.display = 'block';
+    }
+});
+
+document.getElementById('gpuChoice').addEventListener('change', function() {
+    const existingGPUSection = document.getElementById('existingGPUSection');
+    const customGPUSection = document.getElementById('customGPUSection');
+    if (this.value === 'existing') {
+        existingGPUSection.style.display = 'block';
+        customGPUSection.style.display = 'none';
+    } else {
+        existingGPUSection.style.display = 'none';
+        customGPUSection.style.display = 'block';
+    }
+});
+
+document.getElementById('hardDriveCount').addEventListener('change', function() {
+    const count = parseInt(this.value);
+    const container = document.getElementById('hardDriveContainer');
+    container.innerHTML = '';
+    for (let i = 1; i <= count; i++) {
+        container.innerHTML += `
+            <div class="hard-drive-container">
+                <h4>Hard Drive ${i}</h4>
+                <div class="form-group">
+                    <label for="hardDriveType${i}">Type:</label>
+                    <select id="hardDriveType${i}">
+                        <option value="ssd">SSD</option>
+                        <option value="hdd">HDD</option>
+                        <option value="microsdd">MicroSDD</option>
+                        <option value="nanohdd">NanoHDD</option>
+                        <option value="hybridfd">HybridFD</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="hardDriveCapacity${i}">Capacity (GB):</label>
+                    <input type="number" id="hardDriveCapacity${i}" min="1" value="64">
+                </div>
+            </div>
+        `;
+    }
+});
+
+function createSlider(containerId, dotId, max, updateCallback) {
+    const container = document.getElementById(containerId);
+    const dot = document.getElementById(dotId);
+    let isDragging = false;
+
+    function updateDotPosition(clientX) {
+        const rect = container.getBoundingClientRect();
+        let position = (clientX - rect.left) / rect.width;
+        position = Math.max(0, Math.min(position, 1));
+        const value = Math.round(position * (max - 1)) + 1;
+        const leftPosition = (value - 1) / (max - 1) * 100;
+        dot.style.left = `${leftPosition}%`;
+        container.setAttribute('data-value', value);
+        updateCallback(value);
+    }
+
+    container.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        updateDotPosition(e.clientX);
+    });
+
+    document.addEventListener('mousemove', (e) => {
+        if (isDragging) {
+            updateDotPosition(e.clientX);
+        }
+    });
+
+    document.addEventListener('mouseup', () => {
+        isDragging = false;
+    });
+
+    // Initialize with default value
+    updateDotPosition(container.getBoundingClientRect().left);
+}
+
+function updateBackCameras(count) {
+    const container = document.getElementById('backCameraContainer');
+    container.innerHTML = '';
+    for (let i = 1; i <= count; i++) {
+        container.innerHTML += `
+            <div class="camera-container">
+                <h4>Back Camera ${i}</h4>
+                <div class="form-group">
+                    <label for="backCameraMPx${i}">MPx:</label>
+                    <input type="number" id="backCameraMPx${i}" min="0" value="12">
+                </div>
+                <div class="form-group">
+                    <label for="backCameraGPx${i}">GPx:</label>
+                    <input type="number" id="backCameraGPx${i}" min="0" value="0">
+                </div>
+                <div class="form-group">
+                    <label for="backCameraKPx${i}">KPx:</label>
+                    <input type="number" id="backCameraKPx${i}" min="0" value="0">
+                </div>
+            </div>
+        `;
+    }
+}
+
+function updateFrontCameras(count) {
+    const container = document.getElementById('frontCameraContainer');
+    container.innerHTML = '';
+    for (let i = 1; i <= count; i++) {
+        container.innerHTML += `
+            <div class="camera-container">
+                <h4>Front Camera ${i}</h4>
+                <div class="form-group">
+                    <label for="frontCameraMPx${i}">MPx:</label>
+                    <input type="number" id="frontCameraMPx${i}" min="0" value="8">
+                </div>
+                <div class="form-group">
+                    <label for="frontCameraGPx${i}">GPx:</label>
+                    <input type="number" id="frontCameraGPx${i}" min="0" value="0">
+                </div>
+                <div class="form-group">
+                    <label for="frontCameraKPx${i}">KPx:</label>
+                    <input type="number" id="frontCameraKPx${i}" min="0" value="0">
+                </div>
+            </div>
+        `;
+    }
+}
+
+createSlider('backCameraSlider', 'backCameraDot', 6, updateBackCameras);
+createSlider('frontCameraSlider', 'frontCameraDot', 2, updateFrontCameras);
+
+document.getElementById('compatibilityRequirement').addEventListener('change', function() {
+    const compatibleDevicesSection = document.getElementById('compatibleDevicesSection');
+    compatibleDevicesSection.style.display = this.value === 'specific' ? 'block' : 'none';
+});
+
+updatePhoneDisplay();
+</script>
+</body>
+</html>
