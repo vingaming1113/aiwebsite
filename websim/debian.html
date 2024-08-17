@@ -1,8 +1,5 @@
-<!DOCTYPE html>
-<html>
-<head>
-<base href="https://debian.org/terminal/">
-<title>Debian 12 Terminal</title>
+<html><head><base href="https://debian.org/terminal/">
+<title>Debian 12 Terminal with Enhanced Nano Editor</title>
 <style>
   body, html {
     margin: 0;
@@ -40,14 +37,66 @@
   .output-line {
     margin-bottom: 5px;
   }
+  #nano-editor {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #1E1E1E;
+    z-index: 1000;
+  }
+  #nano-content {
+    width: 100%;
+    height: calc(100% - 60px);
+    background-color: #1E1E1E;
+    color: #D4D4D4;
+    border: none;
+    resize: none;
+    padding: 10px;
+    box-sizing: border-box;
+    font-family: monospace;
+    font-size: 16px;
+  }
+  #nano-footer {
+    height: 30px;
+    background-color: #2D2D2D;
+    color: #D4D4D4;
+    padding: 5px;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  #nano-prompt {
+    height: 30px;
+    background-color: #2D2D2D;
+    color: #D4D4D4;
+    padding: 5px;
+    box-sizing: border-box;
+    display: none;
+  }
 </style>
 </head>
 <body>
 <div id="terminal">
   <div id="output"></div>
   <div id="input-line">
-    <span id="prompt">root@debian:~$</span>
+    <span id="prompt">root@debian:/$ </span>
     <input type="text" id="user-input" autofocus>
+  </div>
+</div>
+
+<div id="nano-editor">
+  <textarea id="nano-content"></textarea>
+  <div id="nano-footer">
+    <span>^X Exit</span>
+    <span id="nano-filename"></span>
+  </div>
+  <div id="nano-prompt">
+    <span id="nano-prompt-text"></span>
+    <input type="text" id="nano-prompt-input">
   </div>
 </div>
 
@@ -55,13 +104,113 @@
 const output = document.getElementById('output');
 const userInput = document.getElementById('user-input');
 const prompt = document.getElementById('prompt');
+const nanoEditor = document.getElementById('nano-editor');
+const nanoContent = document.getElementById('nano-content');
+const nanoFilename = document.getElementById('nano-filename');
+const nanoPrompt = document.getElementById('nano-prompt');
+const nanoPromptText = document.getElementById('nano-prompt-text');
+const nanoPromptInput = document.getElementById('nano-prompt-input');
+
+let currentDirectory = '/';
+const fileSystem = {
+  '/': {
+    'home': {
+      'user': {
+        'documents': {
+          'note.txt': 'This is a sample note.'
+        },
+        'downloads': {}
+      }
+    },
+    'etc': {},
+    'var': {}
+  }
+};
 
 const commands = {
-  'help': 'Available commands: help, echo, clear, exit, root',
+  'help': 'Available commands: help, echo, clear, exit, root, ls, cd, mkdir, touch, cat, rm, nano',
   'echo': function(args) { return args.join(' '); },
   'clear': function() { output.innerHTML = ''; return ''; },
   'exit': 'Goodbye! (Note: This is a simulation, so the page won\'t actually close.)',
-  'root': 'ROOT@KALI ROOT@DEBIAN'
+  'root': 'ROOT@KALI ROOT@DEBIAN',
+  'ls': function() {
+    let dir = getDirectory(currentDirectory);
+    return Object.keys(dir).join('  ');
+  },
+  'cd': function(args) {
+    if (args.length === 0) {
+      currentDirectory = '/';
+    } else {
+      let newPath = resolvePath(args[0]);
+      if (directoryExists(newPath)) {
+        currentDirectory = newPath;
+      } else {
+        return `cd: ${args[0]}: No such file or directory`;
+      }
+    }
+    updatePrompt();
+    return '';
+  },
+  'mkdir': function(args) {
+    if (args.length === 0) return 'mkdir: missing operand';
+    let path = resolvePath(args[0]);
+    let parentDir = getParentDirectory(path);
+    let dirName = path.split('/').pop();
+    if (parentDir) {
+      parentDir[dirName] = {};
+      return '';
+    } else {
+      return `mkdir: cannot create directory '${args[0]}': No such file or directory`;
+    }
+  },
+  'touch': function(args) {
+    if (args.length === 0) return 'touch: missing file operand';
+    let path = resolvePath(args[0]);
+    let parentDir = getParentDirectory(path);
+    let fileName = path.split('/').pop();
+    if (parentDir) {
+      parentDir[fileName] = '';
+      return '';
+    } else {
+      return `touch: cannot touch '${args[0]}': No such file or directory`;
+    }
+  },
+  'cat': function(args) {
+    if (args.length === 0) return 'cat: missing file operand';
+    let path = resolvePath(args[0]);
+    let file = getFile(path);
+    if (typeof file === 'string') {
+      return file;
+    } else {
+      return `cat: ${args[0]}: No such file or directory`;
+    }
+  },
+  'rm': function(args) {
+    if (args.length === 0) return 'rm: missing operand';
+    let path = resolvePath(args[0]);
+    let parentDir = getParentDirectory(path);
+    let name = path.split('/').pop();
+    if (parentDir && parentDir.hasOwnProperty(name)) {
+      delete parentDir[name];
+      return '';
+    } else {
+      return `rm: cannot remove '${args[0]}': No such file or directory`;
+    }
+  },
+  'nano': function(args) {
+    if (args.length === 0) {
+      openNanoEditor('', '');
+    } else {
+      let path = resolvePath(args[0]);
+      let file = getFile(path);
+      if (typeof file === 'string' || file === undefined) {
+        openNanoEditor(path, file || '');
+      } else {
+        return `nano: ${args[0]}: Is a directory`;
+      }
+    }
+    return '';
+  }
 };
 
 function addOutput(text) {
@@ -72,14 +221,91 @@ function addOutput(text) {
   output.scrollTop = output.scrollHeight;
 }
 
+function getDirectory(path) {
+  let dir = fileSystem;
+  path.split('/').filter(Boolean).forEach(part => {
+    dir = dir[part];
+  });
+  return dir;
+}
+
+function resolvePath(path) {
+  if (path.startsWith('/')) return path;
+  let resolvedPath = `${currentDirectory}${currentDirectory.endsWith('/') ? '' : '/'}${path}`;
+  let normalizedPath = [];
+  resolvedPath.split('/').forEach(part => {
+    if (part === '..') {
+      normalizedPath.pop();
+    } else if (part && part !== '.') {
+      normalizedPath.push(part);
+    }
+  });
+  return '/' + normalizedPath.join('/');
+}
+
+function directoryExists(path) {
+  try {
+    return typeof getDirectory(path) === 'object';
+  } catch {
+    return false;
+  }
+}
+
+function getParentDirectory(path) {
+  let parts = path.split('/').filter(Boolean);
+  parts.pop();
+  return getDirectory('/' + parts.join('/'));
+}
+
+function getFile(path) {
+  let dir = getParentDirectory(path);
+  let fileName = path.split('/').pop();
+  return dir[fileName];
+}
+
+function openNanoEditor(path, content) {
+  nanoContent.value = content;
+  nanoFilename.textContent = path || '[New File]';
+  nanoEditor.style.display = 'block';
+  nanoContent.focus();
+}
+
+function closeNanoEditor(save = false) {
+  if (save) {
+    saveNanoContent();
+  } else {
+    nanoEditor.style.display = 'none';
+    userInput.focus();
+  }
+}
+
+function saveNanoContent() {
+  let path = nanoFilename.textContent;
+  if (path === '[New File]') {
+    nanoPromptText.textContent = 'File Name to Write: ';
+    nanoPrompt.style.display = 'block';
+    nanoPromptInput.focus();
+  } else {
+    let parentDir = getParentDirectory(path);
+    let fileName = path.split('/').pop();
+    parentDir[fileName] = nanoContent.value;
+    nanoEditor.style.display = 'none';
+    userInput.focus();
+  }
+}
+
+function updatePrompt() {
+  prompt.textContent = `root@debian:${currentDirectory}$ `;
+}
+
 userInput.addEventListener('keydown', function(event) {
   if (event.key === 'Enter') {
-    const command = userInput.value.trim().toLowerCase();
+    const command = userInput.value.trim();
     const parts = command.split(' ');
-    const cmd = parts[0];
+    const cmd = parts[0].toLowerCase();
     const args = parts.slice(1);
 
-    addOutput(`${prompt.textContent} ${command}`);
+    addOutput(`${prompt.textContent}${command}`);
 
     if (commands.hasOwnProperty(cmd)) {
       const result = typeof commands[cmd] === 'function' ? commands[cmd](args) : commands[cmd];
@@ -88,12 +314,44 @@ userInput.addEventListener('keydown', function(event) {
       addOutput(`Command not found: ${cmd}`);
     }
 
+    updatePrompt();
     userInput.value = '';
+  }
+});
+
+document.addEventListener('keydown', function(event) {
+  if (event.ctrlKey && event.key === 'x' && nanoEditor.style.display === 'block') {
+    nanoPromptText.textContent = 'Save modified buffer? ';
+    nanoPrompt.style.display = 'block';
+    nanoPromptInput.focus();
+  }
+});
+
+nanoPromptInput.addEventListener('keydown', function(event) {
+  if (event.key === 'Enter') {
+    let response = nanoPromptInput.value.trim().toLowerCase();
+    if (nanoPromptText.textContent === 'Save modified buffer? ') {
+      if (response === 'y' || response === 'yes') {
+        saveNanoContent();
+      } else {
+        closeNanoEditor(false);
+      }
+    } else if (nanoPromptText.textContent === 'File Name to Write: ') {
+      let fileName = nanoPromptInput.value.trim();
+      let path = resolvePath(fileName);
+      let parentDir = getParentDirectory(path);
+      let finalFileName = path.split('/').pop();
+      parentDir[finalFileName] = nanoContent.value;
+      closeNanoEditor(false);
+    }
+    nanoPrompt.style.display = 'none';
+    nanoPromptInput.value = '';
   }
 });
 
 addOutput('Welcome to Debian 12!');
 addOutput('Type "help" for a list of available commands.');
+updatePrompt();
 </script>
 </body>
-</html
+</html>
