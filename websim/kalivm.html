@@ -1,0 +1,427 @@
+<html><head><base href="https://virtualmachine.online/vm/kali-xfce/desktop">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kali Linux XFCE Desktop - VirtualMachine Online</title>
+<style>
+  body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: Arial, sans-serif;
+    overflow: hidden;
+  }
+  #desktop {
+    background-image: url('https://www.kali.org/images/kali-wallpaper-2020.jpg');
+    background-size: cover;
+    height: 100vh;
+    position: relative;
+  }
+  #taskbar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 40px;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+  }
+  .taskbar-icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 10px;
+    cursor: pointer;
+  }
+  .window {
+    position: absolute;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    display: none;
+  }
+  .window-header {
+    background-color: #2b2b2b;
+    color: #fff;
+    padding: 5px 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+  }
+  .close-button {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 18px;
+    cursor: pointer;
+  }
+  #file-manager {
+    width: 600px;
+    height: 400px;
+    top: 50px;
+    left: 100px;
+  }
+  #file-list {
+    padding: 10px;
+    height: calc(100% - 45px);
+    overflow-y: auto;
+  }
+  #browser-window {
+    width: 800px;
+    height: 600px;
+    top: 60px;
+    left: 150px;
+  }
+  #browser-content {
+    width: 100%;
+    height: calc(100% - 30px);
+    border: none;
+  }
+  #terminal-window {
+    width: 600px;
+    height: 400px;
+    top: 50px;
+    left: 50px;
+  }
+  #terminal-content {
+    background-color: #300a24;
+    color: #fff;
+    padding: 10px;
+    font-family: monospace;
+    height: calc(100% - 30px);
+    overflow-y: auto;
+  }
+  #terminal-input-line {
+    display: flex;
+    align-items: center;
+  }
+  #terminal-prompt {
+    color: #00ff00;
+  }
+  #terminal-input {
+    flex-grow: 1;
+    background: none;
+    border: none;
+    color: #fff;
+    outline: none;
+    font-family: monospace;
+  }
+  .desktop-icon {
+    position: absolute;
+    text-align: center;
+    color: #fff;
+    cursor: pointer;
+  }
+  .desktop-icon img {
+    width: 48px;
+    height: 48px;
+  }
+</style>
+</head>
+<body>
+  <div id="desktop">
+    <!-- Desktop Icons -->
+    <div class="desktop-icon" style="top: 20px; left: 20px;" onclick="openApp('file-manager')">
+      <img src="https://icon-library.com/images/file-manager-icon/file-manager-icon-4.jpg" alt="File Manager">
+      <div>File Manager</div>
+    </div>
+    <div class="desktop-icon" style="top: 120px; left: 20px;" onclick="openApp('browser')">
+      <img src="https://www.mozilla.org/media/protocol/img/logos/firefox/browser/logo-sm.f2523d97cbe0.png" alt="Firefox">
+      <div>Firefox</div>
+    </div>
+    <div class="desktop-icon" style="top: 220px; left: 20px;" onclick="openApp('terminal')">
+      <img src="https://cdn-icons-png.flaticon.com/512/906/906326.png" alt="Terminal">
+      <div>Terminal</div>
+    </div>
+
+    <!-- File Manager Window -->
+    <div id="file-manager" class="window">
+      <div class="window-header">
+        <span>File Manager</span>
+        <button class="close-button" onclick="closeApp('file-manager')">&times;</button>
+      </div>
+      <div id="file-list">
+        <p>Documents</p>
+        <p>Downloads</p>
+        <p>Pictures</p>
+        <p>Videos</p>
+      </div>
+    </div>
+
+    <!-- Browser Window -->
+    <div id="browser-window" class="window">
+      <div class="window-header">
+        <span>Firefox</span>
+        <button class="close-button" onclick="closeApp('browser')">&times;</button>
+      </div>
+      <iframe id="browser-content" src="https://www.kali.org"></iframe>
+    </div>
+
+    <!-- Terminal Window -->
+    <div id="terminal-window" class="window">
+      <div class="window-header">
+        <span>Terminal</span>
+        <button class="close-button" onclick="closeApp('terminal')">&times;</button>
+      </div>
+      <div id="terminal-content">
+        <div id="terminal-output"></div>
+        <div id="terminal-input-line">
+          <span id="terminal-prompt">kali@kali:~$&nbsp;</span>
+          <input type="text" id="terminal-input">
+        </div>
+      </div>
+    </div>
+
+    <!-- Taskbar -->
+    <div id="taskbar">
+      <img src="https://www.kali.org/images/kali-dragon-icon.svg" alt="Start Menu" class="taskbar-icon">
+      <img src="https://icon-library.com/images/file-manager-icon/file-manager-icon-4.jpg" alt="File Manager" class="taskbar-icon" onclick="openApp('file-manager')">
+      <img src="https://www.mozilla.org/media/protocol/img/logos/firefox/browser/logo-sm.f2523d97cbe0.png" alt="Firefox" class="taskbar-icon" onclick="openApp('browser')">
+      <img src="https://cdn-icons-png.flaticon.com/512/906/906326.png" alt="Terminal" class="taskbar-icon" onclick="openApp('terminal')">
+    </div>
+  </div>
+
+  <script>
+    function openApp(appName) {
+      document.getElementById(appName === 'browser' ? 'browser-window' : appName === 'terminal' ? 'terminal-window' : 'file-manager').style.display = 'block';
+    }
+
+    function closeApp(appName) {
+      document.getElementById(appName === 'browser' ? 'browser-window' : appName === 'terminal' ? 'terminal-window' : 'file-manager').style.display = 'none';
+    }
+
+    const terminalContent = document.getElementById('terminal-content');
+    const terminalPrompt = document.getElementById('terminal-prompt');
+    const terminalInput = document.getElementById('terminal-input');
+    const terminalOutput = document.getElementById('terminal-output');
+
+    // Terminal functionality
+    terminalInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const command = terminalInput.value;
+        terminalOutput.innerHTML += `${terminalPrompt.textContent}${command}<br>`;
+        executeCommand(command);
+        terminalInput.value = '';
+        terminalContent.scrollTop = terminalContent.scrollHeight;
+      }
+    });
+
+    let currentDirectory = '/home/kali';
+
+    function executeCommand(command) {
+      const args = command.split(' ');
+      const cmd = args[0].toLowerCase();
+
+      switch(cmd) {
+        case 'ls':
+          listFiles();
+          break;
+        case 'pwd':
+          terminalOutput.innerHTML += `${currentDirectory}<br>`;
+          break;
+        case 'cd':
+          changeDirectory(args[1]);
+          break;
+        case 'whoami':
+          terminalOutput.innerHTML += 'kali<br>';
+          break;
+        case 'date':
+          terminalOutput.innerHTML += new Date().toString() + '<br>';
+          break;
+        case 'clear':
+          terminalOutput.innerHTML = '';
+          break;
+        case 'echo':
+          terminalOutput.innerHTML += `${args.slice(1).join(' ')}<br>`;
+          break;
+        case 'cat':
+          catFile(args[1]);
+          break;
+        case 'mkdir':
+          makeDirectory(args[1]);
+          break;
+        case 'touch':
+          touchFile(args[1]);
+          break;
+        case 'rm':
+          removeFile(args[1]);
+          break;
+        case 'help':
+          showHelp();
+          break;
+        case 'ifconfig':
+          showNetworkInfo();
+          break;
+        case 'nmap':
+          runNmap(args.slice(1));
+          break;
+        default:
+          terminalOutput.innerHTML += `Command not found: ${cmd}. Type 'help' for a list of commands.<br>`;
+      }
+      updatePrompt();
+    }
+
+    function listFiles() {
+      const files = {
+        '/home/kali': ['Documents', 'Downloads', 'Desktop', 'Pictures', 'Videos'],
+        '/home/kali/Documents': ['notes.txt', 'report.pdf'],
+        '/home/kali/Downloads': ['kali-linux-2023.1-installer-amd64.iso'],
+        '/home/kali/Desktop': ['important_file.txt'],
+        '/': ['home', 'etc', 'var', 'usr', 'bin']
+      };
+      
+      const currentFiles = files[currentDirectory] || [];
+      terminalOutput.innerHTML += currentFiles.join('  ') + '<br>';
+    }
+
+    function changeDirectory(dir) {
+      if (!dir || dir === '~') {
+        currentDirectory = '/home/kali';
+      } else if (dir === '..') {
+        const parts = currentDirectory.split('/');
+        parts.pop();
+        currentDirectory = parts.join('/') || '/';
+      } else if (dir.startsWith('/')) {
+        currentDirectory = dir;
+      } else {
+        currentDirectory = `${currentDirectory}/${dir}`;
+      }
+    }
+
+    function catFile(filename) {
+      const fileContents = {
+        'notes.txt': 'These are some important notes for the pentest.',
+        'important_file.txt': 'Top secret information!'
+      };
+      
+      if (fileContents[filename]) {
+        terminalOutput.innerHTML += fileContents[filename] + '<br>';
+      } else {
+        terminalOutput.innerHTML += `cat: ${filename}: No such file or directory<br>`;
+      }
+    }
+
+    function makeDirectory(dirname) {
+      terminalOutput.innerHTML += `mkdir: created directory '${dirname}'<br>`;
+    }
+
+    function touchFile(filename) {
+      terminalOutput.innerHTML += `touch: created file '${filename}'<br>`;
+    }
+
+    function removeFile(filename) {
+      terminalOutput.innerHTML += `removed '${filename}'<br>`;
+    }
+
+    function showHelp() {
+      const helpText = `
+Available commands:
+  ls - list directory contents
+  pwd - print working directory
+  cd [dir] - change directory
+  whoami - print effective user name
+  date - print current date and time
+  clear - clear terminal screen
+  echo [text] - display a line of text
+  cat [file] - concatenate and print files
+  mkdir [dir] - make directories
+  touch [file] - create empty file(s)
+  rm [file] - remove files or directories
+  help - show this help message
+  ifconfig - display network interfaces
+  nmap [options] [target] - network exploration tool and security scanner
+`;
+      terminalOutput.innerHTML += helpText;
+    }
+
+    function showNetworkInfo() {
+      const networkInfo = `
+eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 192.168.1.100  netmask 255.255.255.0  broadcast 192.168.1.255
+        inet6 fe80::215:5dff:fe00:1234  prefixlen 64  scopeid 0x20<link>
+        ether 00:15:5d:00:12:34  txqueuelen 1000  (Ethernet)
+        RX packets 1234  bytes 1234567 (1.2 MB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 5678  bytes 5678901 (5.6 MB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536
+        inet 127.0.0.1  netmask 255.0.0.0
+        inet6 ::1  prefixlen 128  scopeid 0x10<host>
+        loop  txqueuelen 1000  (Local Loopback)
+        RX packets 9876  bytes 9876543 (9.8 MB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 9876  bytes 9876543 (9.8 MB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+`;
+      terminalOutput.innerHTML += networkInfo;
+    }
+
+    function runNmap(args) {
+      if (args.length === 0) {
+        terminalOutput.innerHTML += "Usage: nmap [Scan Type(s)] [Options] {target specification}<br>";
+        return;
+      }
+      
+      terminalOutput.innerHTML += "Starting Nmap scan...<br>";
+      setTimeout(() => {
+        terminalOutput.innerHTML += `
+Nmap scan report for ${args[args.length - 1]}
+Host is up (0.0050s latency).
+Not shown: 998 closed ports
+PORT   STATE SERVICE
+22/tcp open  ssh
+80/tcp open  http
+
+Nmap done: 1 IP address (1 host up) scanned in 0.05 seconds
+`;
+      }, 2000);
+    }
+
+    function updatePrompt() {
+      const shortDir = currentDirectory.replace('/home/kali', '~');
+      terminalPrompt.textContent = `kali@kali:${shortDir}$ `;
+    }
+
+    // Initialize terminal
+    terminalOutput.innerHTML = "Welcome to Kali Linux!<br>Type 'help' for a list of available commands.<br><br>";
+    updatePrompt();
+
+    // Make windows draggable
+    const windows = document.querySelectorAll('.window');
+    windows.forEach(makeWindowDraggable);
+
+    function makeWindowDraggable(element) {
+      let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+      element.querySelector('.window-header').onmousedown = dragMouseDown;
+
+      function dragMouseDown(e) {
+        e = e || window.event;
+        e.preventDefault();
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        document.onmouseup = closeDragElement;
+        document.onmousemove = elementDrag;
+      }
+
+      function elementDrag(e) {
+        e = e || window.event;
+        e.preventDefault();
+        pos1 = pos3 - e.clientX;
+        pos2 = pos4 - e.clientY;
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        element.style.top = (element.offsetTop - pos2) + "px";
+        element.style.left = (element.offsetLeft - pos1) + "px";
+      }
+
+      function closeDragElement() {
+        document.onmouseup = null;
+        document.onmousemove = null;
+      }
+    }
+  </script>
+</body>
+</html>
