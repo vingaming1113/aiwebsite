@@ -15,11 +15,22 @@
     height: 100%;
     padding: 10px;
     box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  #output {
+    flex-grow: 1;
     overflow-y: auto;
+    margin-bottom: 10px;
   }
   #input-line {
     display: flex;
     align-items: center;
+    position: sticky;
+    bottom: 0;
+    background-color: #1E1E1E;
+    padding: 5px 0;
   }
   #prompt {
     color: #569CD6;
@@ -36,6 +47,7 @@
   }
   .output-line {
     margin-bottom: 5px;
+    white-space: pre-wrap;
   }
   #nano-editor {
     display: none;
@@ -83,7 +95,7 @@
 <div id="terminal">
   <div id="output"></div>
   <div id="input-line">
-    <span id="prompt">root@debian:/$ </span>
+    <span id="prompt">user@debian:/$ </span>
     <input type="text" id="user-input" autofocus>
   </div>
 </div>
@@ -110,8 +122,10 @@ const nanoFilename = document.getElementById('nano-filename');
 const nanoPrompt = document.getElementById('nano-prompt');
 const nanoPromptText = document.getElementById('nano-prompt-text');
 const nanoPromptInput = document.getElementById('nano-prompt-input');
+const terminal = document.getElementById('terminal');
 
 let currentDirectory = '/';
+let isRoot = false;
 const fileSystem = {
   '/': {
     'home': {
@@ -127,12 +141,58 @@ const fileSystem = {
   }
 };
 
+const TOTAL_STORAGE = 512 * 1024 * 1024 * 1024; // 512 GB in bytes
+let usedStorage = 2 * 1024 * 1024 * 1024; // 2 GB in bytes
+
+function calculateFileSize(content) {
+  let size = 0;
+  for (let char of content) {
+    if (/[a-zA-Z]/.test(char)) size += 5;
+    else if (/[0-9]/.test(char)) size += 8;
+    else if (char === '-') size += 10;
+    else if (char === '+') size += 9;
+    else if (char === '/') size += 12;
+    else if (char === '.') size += 1;
+    else if (char === ',') size += 2;
+    else if (char === ';') size += 3;
+    else if (char === ':') size += 2;
+    else if (char === "'") size += 1.5;
+    else if (char === '"') size += 3;
+    else if (char === '\\') size += 12;
+    else if (char === '_') size += 2.5;
+    else if (char === '?') size += 14;
+    else if (char === '=') size += 11;
+    else size += 20;
+  }
+  return size;
+}
+
+function updateUsedStorage() {
+  usedStorage = 2 * 1024 * 1024 * 1024; // Reset to 2 GB base usage
+  function traverseFS(obj) {
+    for (let key in obj) {
+      if (typeof obj[key] === 'string') {
+        usedStorage += calculateFileSize(obj[key]);
+      } else if (typeof obj[key] === 'object') {
+        traverseFS(obj[key]);
+      }
+    }
+  }
+  traverseFS(fileSystem);
+}
+
 const commands = {
-  'help': 'Available commands: help, echo, clear, exit, root, ls, cd, mkdir, touch, cat, rm, nano',
+  'help': function() {
+    let customCommands = findCustomCommands().map(cmd => cmd.replace('.cmdtxt', '').replace('.cmdjs', '').replace('.nand', '')).join(', ');
+    let output = 'Available commands: help, echo, clear, exit, ls, cd, mkdir, touch, cat, rm, nano, filetypes, documentation, su, neofetch, strg';
+    if (customCommands) {
+      output += ' | Custom commands: ' + customCommands;
+    }
+    return output;
+  },
   'echo': function(args) { return args.join(' '); },
   'clear': function() { output.innerHTML = ''; return ''; },
   'exit': 'Goodbye! (Note: This is a simulation, so the page won\'t actually close.)',
-  'root': 'ROOT@KALI ROOT@DEBIAN',
   'ls': function() {
     let dir = getDirectory(currentDirectory);
     return Object.keys(dir).join('  ');
@@ -158,6 +218,7 @@ const commands = {
     let dirName = path.split('/').pop();
     if (parentDir) {
       parentDir[dirName] = {};
+      updateUsedStorage();
       return '';
     } else {
       return `mkdir: cannot create directory '${args[0]}': No such file or directory`;
@@ -170,6 +231,7 @@ const commands = {
     let fileName = path.split('/').pop();
     if (parentDir) {
       parentDir[fileName] = '';
+      updateUsedStorage();
       return '';
     } else {
       return `touch: cannot touch '${args[0]}': No such file or directory`;
@@ -192,6 +254,7 @@ const commands = {
     let name = path.split('/').pop();
     if (parentDir && parentDir.hasOwnProperty(name)) {
       delete parentDir[name];
+      updateUsedStorage();
       return '';
     } else {
       return `rm: cannot remove '${args[0]}': No such file or directory`;
@@ -210,6 +273,97 @@ const commands = {
       }
     }
     return '';
+  },
+  'filetypes': function() {
+    return 'Active file types:\n.cmdtxt - Text-based custom command\n.cmdjs - JavaScript-based custom command\n.nand - Hybrid command with text, JavaScript, and firmware capabilities';
+  },
+  'documentation': function(args) {
+    if (args.length === 0) {
+      return 'Available documentation topics: nand';
+    } else if (args[0].toLowerCase() === 'nand') {
+      return '<nof> - No firmware command part, doesn\'t require sudo permissions\n' +
+             '<txt> - Output should be text only, doesn\'t require sudo permissions\n' +
+             '<firm> - Firmware command part, requires sudo permissions\n' +
+             '<js> - Output (or action) should be in JavaScript, requires sudo permissions';
+    } else {
+      return `Documentation for '${args[0]}' not found.`;
+    }
+  },
+  'su': function(args) {
+    if (args.length === 0 || args[0] === '-' || args[0] === 'root') {
+      if (isRoot) {
+        return 'You are already root.';
+      }
+      isRoot = true;
+      updatePrompt();
+      return 'Root access granted.';
+    } else if (args[0] === 'user') {
+      isRoot = false;
+      updatePrompt();
+      return 'Switched to user permissions.';
+    } else {
+      return `su: user ${args[0]} does not exist`;
+    }
+  },
+  'neofetch': function(args) {
+    const usedRam = Math.floor(Math.random() * (1024 - 256 + 1)) + 256;
+    const asciiLogo = `
+                                  _,met$$$$$gg.
+                               ,g$$$$$$$$$$$$$$$P.
+                             ,g$$P""       """Y$$.".
+                            ,$$P'              \`$$$.
+                          ',$$P       ,ggs.     \`$$b:
+                          \`d$$'     ,$P"'   .    $$$
+                           $$P      d$'     ,    $$P
+                           $$:      $$.   -    ,d$$'
+                           $$;      Y$b._   _,d$P'
+                           Y$$.    \`.\`"Y$$$$P"'
+                           \`$$b      "-.__
+                            \`Y$$b
+                             \`Y$$.
+                               \`$$b.
+                                 \`Y$$b.
+                                   \`"Y$b._
+                                       \`""""
+
+                       _,           _,      ,''.
+                     '$$'         '$$'     '.  ,'
+                      $$           $$        ''
+                      $$           $$         _,           _
+                ,d$$$g$$  ,d$$$b.  $$,d$$$b.'$$' g$$$$$b.'$$,d$$b.
+               ,$P'  '$$ ,$P' 'Y$. $$$'  '$$ $$  "'   '$$ $$$' '$$
+               $$'    $$ $$'   '$$ $$'    $$ $$  ,ggggg$$ $$'   $$
+               $$     $$ $$ggggg$$ $$     $$ $$ ,$P"   $$ $$    $$
+               $$    ,$$ $$.       $$    ,$P $$ $$'   ,$$ $$    $$
+               '$g. ,$$$ '$$._ _., $$ _,g$P' $$ '$b. ,$$$ $$    $$
+                'Y$$P'$$. 'Y$$$$P',$$$$P"'  ,$$. 'Y$$P'$$.$$.  ,$$.
+    `;
+    updateUsedStorage();
+    const usedGB = (usedStorage / 1024 / 1024 / 1024).toFixed(2);
+    const usedMB = (usedStorage / 1024 / 1024).toFixed(2);
+    const storageInfo = args[0] === '--strg-mb' ? 
+      `${usedMB}MB used out of 524288MB` :
+      `${usedGB}GB used out of 512GB`;
+    const specs = `
+CPU: Intel Core i5-13600K
+RAM: ${usedRam}MB used out of 16839MB RAM
+OS: Debian 12.6.0 Custom Edition
+Kernel Version: Linux 5.1
+Storage: ${storageInfo}
+    `;
+    return asciiLogo + specs;
+  },
+  'strg': function(args) {
+    updateUsedStorage();
+    const usedGB = usedStorage / 1024 / 1024 / 1024;
+    const totalGB = TOTAL_STORAGE / 1024 / 1024 / 1024;
+    if (args[0] === 'mb') {
+      const usedMB = usedStorage / 1024 / 1024;
+      const totalMB = TOTAL_STORAGE / 1024 / 1024;
+      return `Storage usage: ${usedMB.toFixed(2)}MB / ${totalMB.toFixed(2)}MB`;
+    } else {
+      return `Storage usage: ${usedGB.toFixed(2)}GB / ${totalGB.toFixed(2)}GB`;
+    }
   }
 };
 
@@ -218,14 +372,25 @@ function addOutput(text) {
   line.className = 'output-line';
   line.textContent = text;
   output.appendChild(line);
+  
+  // Remove old lines if there are too many
+  while (output.scrollHeight > output.clientHeight) {
+    output.removeChild(output.firstChild);
+  }
+
+  // Scroll to the bottom
   output.scrollTop = output.scrollHeight;
 }
 
 function getDirectory(path) {
   let dir = fileSystem;
-  path.split('/').filter(Boolean).forEach(part => {
+  let parts = path.split('/').filter(Boolean);
+  for (let part of parts) {
+    if (dir[part] === undefined) {
+      return undefined;
+    }
     dir = dir[part];
-  });
+  }
   return dir;
 }
 
@@ -244,11 +409,8 @@ function resolvePath(path) {
 }
 
 function directoryExists(path) {
-  try {
-    return typeof getDirectory(path) === 'object';
-  } catch {
-    return false;
-  }
+  let dir = getDirectory(path);
+  return typeof dir === 'object' && dir !== null;
 }
 
 function getParentDirectory(path) {
@@ -259,6 +421,7 @@ function getParentDirectory(path) {
 
 function getFile(path) {
   let dir = getParentDirectory(path);
+  if (!dir) return undefined;
   let fileName = path.split('/').pop();
   return dir[fileName];
 }
@@ -288,21 +451,140 @@ function saveNanoContent() {
   } else {
     let parentDir = getParentDirectory(path);
     let fileName = path.split('/').pop();
-    parentDir[fileName] = nanoContent.value;
-    nanoEditor.style.display = 'none';
-    userInput.focus();
+    if (parentDir) {
+      parentDir[fileName] = nanoContent.value;
+      updateUsedStorage();
+      nanoEditor.style.display = 'none';
+      userInput.focus();
+    } else {
+      addOutput(`Error: Cannot save file to ${path}`);
+    }
   }
 }
 
 function updatePrompt() {
-  prompt.textContent = `root@debian:${currentDirectory}$ `;
+  let user = isRoot ? 'root' : 'user';
+  prompt.textContent = `${user}@debian:${currentDirectory}$ `;
+}
+
+function findCustomCommands() {
+  let customCommands = [];
+  function searchDir(dir) {
+    for (let key in dir) {
+      if (typeof dir[key] === 'string' && (key.endsWith('.cmdtxt') || key.endsWith('.cmdjs') || key.endsWith('.nand'))) {
+        customCommands.push(key);
+      } else if (typeof dir[key] === 'object') {
+        searchDir(dir[key]);
+      }
+    }
+  }
+  searchDir(fileSystem);
+  return customCommands;
+}
+
+function executeCustomCommand(command, args) {
+  let path = findCustomCommandPath(command);
+  if (!path) return `Command not found: ${command}`;
+
+  let file = getFile(path);
+  if (!file) return `Error: File not found at ${path}`;
+
+  if (path.endsWith('.cmdtxt')) {
+    return file;
+  } else if (path.endsWith('.cmdjs')) {
+    try {
+      return eval(file);
+    } catch (error) {
+      return `Error executing ${command}: ${error.message}`;
+    }
+  } else if (path.endsWith('.nand')) {
+    return executeNandCommand(file, isRoot);
+  }
+}
+
+function executeNandCommand(content, isRoot) {
+  let output = '';
+  let inNof = false;
+  let inFirm = false;
+  let lines = content.split('\n');
+  for (let line of lines) {
+    line = line.trim();
+    if (line === '<nof>') {
+      inNof = true;
+      inFirm = false;
+    } else if (line === '</nof>') {
+      inNof = false;
+    } else if (line === '<firm>') {
+      inNof = false;
+      inFirm = true;
+    } else if (line === '</firm>') {
+      inFirm = false;
+    } else if (inNof) {
+      if (line.startsWith('<txt>') && line.endsWith('</txt>')) {
+        output += line.slice(5, -6) + '\n';
+      } else if (line === '') {
+        // Ignore empty lines in <nof> section
+        continue;
+      } else {
+        output += `Error in .nand file: Invalid syntax in <nof> section: ${line}\n`;
+      }
+    } else if (inFirm) {
+      if (!isRoot) {
+        output += 'Error: Root permissions required for <firm> section\n';
+      } else if (line.startsWith('<txt>') && line.endsWith('</txt>')) {
+        output += line.slice(5, -6) + '\n';
+      } else if (line.startsWith('<js>') && line.endsWith('</js>')) {
+        let script = line.slice(4, -5).trim();
+        if (script !== '<! Your Script Here !>') {
+          try {
+            output += eval(script) + '\n';
+          } catch (error) {
+            output += `Error executing JS: ${error.message}\n`;
+          }
+        } else {
+          output += 'Placeholder JavaScript not executed.\n';
+        }
+      } else if (line === '') {
+        // Ignore empty lines in <firm> section
+        continue;
+      } else {
+        output += `Error in .nand file: Invalid syntax in <firm> section: ${line}\n`;
+      }
+    } else if (line === '') {
+      // Ignore empty lines outside of sections
+      continue;
+    } else {
+      output += `Error in .nand file: Content outside of <nof> or <firm> sections: ${line}\n`;
+    }
+  }
+  return output.trim();
+}
+
+function findCustomCommandPath(command) {
+  let customCommands = findCustomCommands();
+  let matchingCommand = customCommands.find(cmd => cmd.replace('.cmdtxt', '').replace('.cmdjs', '').replace('.nand', '') === command);
+  if (matchingCommand) {
+    function searchDir(dir, path = '') {
+      for (let key in dir) {
+        if (key === matchingCommand) {
+          return path + '/' + key;
+        } else if (typeof dir[key] === 'object') {
+          let result = searchDir(dir[key], path + '/' + key);
+          if (result) return result;
+        }
+      }
+      return null;
+    }
+    return searchDir(fileSystem).slice(1); // Remove leading slash
+  }
+  return null;
 }
 
 userInput.addEventListener('keydown', function(event) {
   if (event.key === 'Enter') {
     const command = userInput.value.trim();
     const parts = command.split(' ');
-    const cmd = parts[0].toLowerCase();
+    const cmd = parts[0];
     const args = parts.slice(1);
 
     addOutput(`${prompt.textContent}${command}`);
@@ -310,8 +592,9 @@ userInput.addEventListener('keydown', function(event) {
     if (commands.hasOwnProperty(cmd)) {
       const result = typeof commands[cmd] === 'function' ? commands[cmd](args) : commands[cmd];
       addOutput(result);
-    } else if (cmd) {
-      addOutput(`Command not found: ${cmd}`);
+    } else {
+      const customResult = executeCustomCommand(cmd, args);
+      addOutput(customResult);
     }
 
     updatePrompt();
@@ -321,35 +604,49 @@ userInput.addEventListener('keydown', function(event) {
 
 document.addEventListener('keydown', function(event) {
   if (event.ctrlKey && event.key === 'x' && nanoEditor.style.display === 'block') {
-    nanoPromptText.textContent = 'Save modified buffer? ';
-    nanoPrompt.style.display = 'block';
-    nanoPromptInput.focus();
+    if (nanoFilename.textContent === '[New File]') {
+      nanoPromptText.textContent = 'File Name to Write: ';
+      nanoPrompt.style.display = 'block';
+      nanoPromptInput.focus();
+    } else {
+      saveNanoContent();
+    }
   }
 });
 
 nanoPromptInput.addEventListener('keydown', function(event) {
   if (event.key === 'Enter') {
-    let response = nanoPromptInput.value.trim().toLowerCase();
-    if (nanoPromptText.textContent === 'Save modified buffer? ') {
-      if (response === 'y' || response === 'yes') {
-        saveNanoContent();
-      } else {
-        closeNanoEditor(false);
-      }
-    } else if (nanoPromptText.textContent === 'File Name to Write: ') {
-      let fileName = nanoPromptInput.value.trim();
+    let fileName = nanoPromptInput.value.trim();
+    if (fileName) {
       let path = resolvePath(fileName);
+      let parts = path.split('/');
+      let parentPath = parts.slice(0, -1).join('/');
+      let finalFileName = parts[parts.length - 1];
+      
+      // Create parent directories if they don't exist
+      let currentPath = '';
+      for (let part of parts.slice(0, -1)) {
+        currentPath += '/' + part;
+        if (!directoryExists(currentPath)) {
+          commands.mkdir([currentPath]);
+        }
+      }
+
       let parentDir = getParentDirectory(path);
-      let finalFileName = path.split('/').pop();
-      parentDir[finalFileName] = nanoContent.value;
-      closeNanoEditor(false);
+      if (parentDir) {
+        parentDir[finalFileName] = nanoContent.value;
+        updateUsedStorage();
+        closeNanoEditor(false);
+      } else {
+        addOutput(`Error: Cannot save file to ${path}`);
+      }
     }
     nanoPrompt.style.display = 'none';
     nanoPromptInput.value = '';
   }
 });
 
-addOutput('Welcome to Debian 12!');
+addOutput('Welcome to Debian 12.6.0 Custom Edition!');
 addOutput('Type "help" for a list of available commands.');
 updatePrompt();
 </script>
