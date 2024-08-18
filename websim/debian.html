@@ -1,5 +1,5 @@
 <html><head><base href="https://debian.org/terminal/">
-<title>Debian 12 Terminal</title>
+<title>Debian 12.6.0 Custom Edition Terminal</title>
 <style>
   body, html {
     margin: 0;
@@ -21,8 +21,10 @@
   }
   #output {
     flex-grow: 1;
-    overflow-y: auto;
+    overflow-y: hidden;
     margin-bottom: 10px;
+    word-wrap: break-word;
+    white-space: pre-wrap;
   }
   #input-line {
     display: flex;
@@ -48,6 +50,7 @@
   .output-line {
     margin-bottom: 5px;
     white-space: pre-wrap;
+    word-wrap: break-word;
   }
   #nano-editor {
     display: none;
@@ -70,6 +73,8 @@
     box-sizing: border-box;
     font-family: monospace;
     font-size: 16px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
   }
   #nano-footer {
     height: 30px;
@@ -89,14 +94,59 @@
     box-sizing: border-box;
     display: none;
   }
+  #progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 20px;
+    background-color: #2D2D2D;
+    display: none;
+  }
+  #progress-fill {
+    height: 100%;
+    width: 0;
+    background-color: #569CD6;
+    transition: width 0.1s;
+  }
+  #progress-text {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #D4D4D4;
+  }
+  #kernel-panic {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #0000AA;
+    color: #FFFFFF;
+    font-family: monospace;
+    font-size: 24px;
+    text-align: center;
+    padding-top: 20%;
+    z-index: 2000;
+  }
 </style>
 </head>
 <body>
 <div id="terminal">
+  <div id="progress-bar">
+    <div id="progress-fill"></div>
+    <div id="progress-text"></div>
+  </div>
   <div id="output"></div>
   <div id="input-line">
     <span id="prompt">user@debian:/$ </span>
-    <input type="text" id="user-input" autofocus>
+    <input type="text" id="user-input" autofocus autocomplete="off">
   </div>
 </div>
 
@@ -112,6 +162,10 @@
   </div>
 </div>
 
+<div id="kernel-panic">
+  KERNEL_PANIC_TRIGGER_MANUAL
+</div>
+
 <script>
 const output = document.getElementById('output');
 const userInput = document.getElementById('user-input');
@@ -122,27 +176,84 @@ const nanoFilename = document.getElementById('nano-filename');
 const nanoPrompt = document.getElementById('nano-prompt');
 const nanoPromptText = document.getElementById('nano-prompt-text');
 const nanoPromptInput = document.getElementById('nano-prompt-input');
-const terminal = document.getElementById('terminal');
+const progressBar = document.getElementById('progress-bar');
+const progressFill = document.getElementById('progress-fill');
+const progressText = document.getElementById('progress-text');
+const kernelPanic = document.getElementById('kernel-panic');
 
 let currentDirectory = '/';
 let isRoot = false;
-const fileSystem = {
-  '/': {
-    'home': {
-      'user': {
-        'documents': {
-          'note.txt': 'This is a sample note.'
+let networkSpeed = 10 * 1024 * 1024; // Default 10 MB/s
+let stableNetworkSpeed = 10 * 1024 * 1024; // Stable speed
+let currentNetworkSpeed = networkSpeed; // Current fluctuating speed
+let currentUser = 'user';
+let loginMethod = 'default'; // 'default', 'su', or 'login'
+let isLoggedIn = true; // New variable to track login state
+let isKernelPanic = false; // New variable to track kernel panic state
+let users = {
+  'root': {
+    password: '',
+    fileSystem: {
+      '/': {
+        'home': {
+          'root': {}
         },
-        'downloads': {}
+        'etc': {},
+        'var': {},
+        'apt-pkgs': {}
       }
-    },
-    'etc': {},
-    'var': {}
+    }
+  },
+  'user': {
+    password: '',
+    fileSystem: {
+      '/': {
+        'home': {
+          'user': {
+            'documents': {
+              'note.txt': 'This is a sample note.'
+            },
+            'downloads': {}
+          }
+        },
+        'etc': {},
+        'var': {},
+        'apt-pkgs': {}
+      }
+    }
   }
 };
 
 const TOTAL_STORAGE = 512 * 1024 * 1024 * 1024; // 512 GB in bytes
-let usedStorage = 2 * 1024 * 1024 * 1024; // 2 GB in bytes
+let usedStorage = 2 * 1024 * 1024 * 1024; // 2 GB base usage in bytes
+
+const availablePackages = {
+  'hello-world': {
+    filename: 'hello-world',
+    content: 'Hello World!',
+    size: 1024 * 1024 // 1 MB
+  },
+  'bye-world': {
+    filename: 'bye-world',
+    content: 'Bye World!',
+    size: 512 * 1024 // 512 KB
+  },
+  'big-file-test': {
+    filename: 'big-file-test',
+    content: '#############################################$@%$#%^$%^$!%^@$!%^@$!%$@%!$@^&$@!$&@^$%!&@%^!@'.repeat(100),
+    size: 100 * 1024 * 1024 // 100 MB
+  },
+  'kernel-panic': {
+    filename: 'kernel-panic',
+    content: 'KERNEL_PANIC_TRIGGER_MANUAL',
+    size: 62.28 * 1024 // 62.28 KB
+  },
+  'userman': {
+    filename: 'userman',
+    content: 'User Management System',
+    size: 257.28 * 1024 * 1024 // 257.28 MB
+  }
+};
 
 function calculateFileSize(content) {
   let size = 0;
@@ -164,7 +275,7 @@ function calculateFileSize(content) {
     else if (char === '=') size += 11;
     else size += 20;
   }
-  return size;
+  return Math.ceil(size);
 }
 
 function updateUsedStorage() {
@@ -178,23 +289,48 @@ function updateUsedStorage() {
       }
     }
   }
-  traverseFS(fileSystem);
+  for (let user in users) {
+    traverseFS(users[user].fileSystem);
+  }
+  // Add the size of installed packages
+  for (let user in users) {
+    if (users[user].fileSystem['/']['apt-pkgs']) {
+      for (let pkg in users[user].fileSystem['/']['apt-pkgs']) {
+        if (availablePackages[pkg]) {
+          usedStorage += availablePackages[pkg].size;
+        }
+      }
+    }
+  }
 }
 
 const commands = {
   'help': function() {
     let customCommands = findCustomCommands().map(cmd => cmd.replace('.cmdtxt', '').replace('.cmdjs', '').replace('.nand', '')).join(', ');
-    let output = 'Available commands: help, echo, clear, exit, ls, cd, mkdir, touch, cat, rm, nano, filetypes, documentation, su, neofetch, strg';
+    let aptCommands = Object.keys(users[currentUser].fileSystem['/']['apt-pkgs'] || {})
+      .filter(cmd => cmd !== 'userman' && cmd === availablePackages[cmd]?.filename)
+      .join(', ');
+    let output = 'Available commands: help, echo, clear, exit, ls, cd, mkdir, touch, cat, rm, nano, filetypes, documentation, su, neofetch, strg, apt, net-sim, net-show, sudo, login, logoff';
     if (customCommands) {
       output += ' | Custom commands: ' + customCommands;
+    }
+    if (aptCommands) {
+      output += ' | Installed apt commands: ' + aptCommands;
+    }
+    if (users[currentUser].fileSystem['/']['apt-pkgs'] && users[currentUser].fileSystem['/']['apt-pkgs'].hasOwnProperty('userman')) {
+      output += ' | Userman commands: create-user, delete-user, passwd';
     }
     return output;
   },
   'echo': function(args) { return args.join(' '); },
   'clear': function() { output.innerHTML = ''; return ''; },
   'exit': 'Goodbye! (Note: This is a simulation, so the page won\'t actually close.)',
-  'ls': function() {
-    let dir = getDirectory(currentDirectory);
+  'ls': function(args) {
+    let path = args[0] || currentDirectory;
+    let dir = getDirectory(resolvePath(path));
+    if (dir === undefined) {
+      return `ls: cannot access '${path}': No such file or directory`;
+    }
     return Object.keys(dir).join('  ');
   },
   'cd': function(args) {
@@ -217,6 +353,9 @@ const commands = {
     let parentDir = getParentDirectory(path);
     let dirName = path.split('/').pop();
     if (parentDir) {
+      if (path.startsWith('/apt-pkgs/') && !isRoot) {
+        return 'mkdir: cannot create directory in /apt-pkgs/: Permission denied';
+      }
       parentDir[dirName] = {};
       updateUsedStorage();
       return '';
@@ -230,6 +369,9 @@ const commands = {
     let parentDir = getParentDirectory(path);
     let fileName = path.split('/').pop();
     if (parentDir) {
+      if (path.startsWith('/apt-pkgs/') && !isRoot) {
+        return 'touch: cannot create file in /apt-pkgs/: Permission denied';
+      }
       parentDir[fileName] = '';
       updateUsedStorage();
       return '';
@@ -253,6 +395,9 @@ const commands = {
     let parentDir = getParentDirectory(path);
     let name = path.split('/').pop();
     if (parentDir && parentDir.hasOwnProperty(name)) {
+      if (path.startsWith('/apt-pkgs/') && !isRoot) {
+        return 'rm: cannot remove file in /apt-pkgs/: Permission denied';
+      }
       delete parentDir[name];
       updateUsedStorage();
       return '';
@@ -267,6 +412,9 @@ const commands = {
       let path = resolvePath(args[0]);
       let file = getFile(path);
       if (typeof file === 'string' || file === undefined) {
+        if (path.startsWith('/apt-pkgs/') && !isRoot) {
+          return 'nano: cannot edit file in /apt-pkgs/: Permission denied';
+        }
         openNanoEditor(path, file || '');
       } else {
         return `nano: ${args[0]}: Is a directory`;
@@ -295,10 +443,16 @@ const commands = {
         return 'You are already root.';
       }
       isRoot = true;
+      currentUser = 'root';
+      currentDirectory = '/';
+      loginMethod = 'su';
       updatePrompt();
       return 'Root access granted.';
     } else if (args[0] === 'user') {
       isRoot = false;
+      currentUser = 'user';
+      currentDirectory = '/';
+      loginMethod = 'su';
       updatePrompt();
       return 'Switched to user permissions.';
     } else {
@@ -364,291 +518,491 @@ Storage: ${storageInfo}
     } else {
       return `Storage usage: ${usedGB.toFixed(2)}GB / ${totalGB.toFixed(2)}GB`;
     }
+  },
+  'apt': function(args) {
+    if (args.length === 0) {
+      return 'Usage: apt <command>\nCommands: install, search, remove, packages';
+    }
+    switch (args[0]) {
+      case 'install':
+        if (!isRoot) {
+          return 'E: Could not open lock file /var/lib/dpkg/lock-frontend - open (13: Permission denied)\nE: Unable to acquire the dpkg frontend lock (/var/lib/dpkg/lock-frontend), are you root?';
+        }
+        return aptInstall(args.slice(1));
+      case 'search':
+        return aptSearch(args.slice(1));
+      case 'remove':
+        if (!isRoot) {
+          return 'E: Could not open lock file /var/lib/dpkg/lock-frontend - open (13: Permission denied)\nE: Unable to acquire the dpkg frontend lock (/var/lib/dpkg/lock-frontend), are you root?';
+        }
+        return aptRemove(args.slice(1));
+      case 'packages':
+        return aptPackages();
+      default:
+        return `E: Invalid operation ${args[0]}`;
+    }
+  },
+  'net-sim': function(args) {
+    if (args.length !== 2) {
+      return 'Usage: net-sim <speed> <KB/MB/GB>';
+    }
+    const speed = parseFloat(args[0]);
+    const unit = args[1].toUpperCase();
+    if (isNaN(speed) || speed <= 0) {
+      return 'Error: Invalid speed value';
+    }
+    switch (unit) {
+      case 'KB':
+        stableNetworkSpeed = speed * 1024;
+        break;
+      case 'MB':
+        stableNetworkSpeed = speed * 1024 * 1024;
+        break;
+      case 'GB':
+        stableNetworkSpeed = speed * 1024 * 1024 * 1024;
+        break;
+      default:
+        return 'Error: Invalid unit. Use KB, MB, or GB';
+    }
+    currentNetworkSpeed = stableNetworkSpeed;
+    return `Network speed set to ${speed} ${unit}/s`;
+  },
+  'net-show': function(args) {
+    const showStable = args[0] === '--stable';
+    const speed = showStable ? stableNetworkSpeed : currentNetworkSpeed;
+    let unit, value;
+    if (speed >= 1024 * 1024 * 1024) {
+      unit = 'GB/s';
+      value = (speed / (1024 * 1024 * 1024)).toFixed(2);
+    } else if (speed >= 1024 * 1024) {
+      unit = 'MB/s';
+      value = (speed / (1024 * 1024)).toFixed(2);
+    } else {
+      unit = 'KB/s';
+      value = (speed / 1024).toFixed(2);
+    }
+    if (showStable) {
+      return `Stable network speed: ${value} ${unit}`;
+    } else {
+      return `Current network speed: ${value} ${unit}`;
+    }
+  },
+  'sudo': function(args) {
+    if (args.length === 0) {
+      return 'Usage: sudo <command>';
+    }
+    const originalIsRoot = isRoot;
+    isRoot = true;
+    const result = executeCommand(args.join(' '));
+    isRoot = originalIsRoot;
+    return result;
+  },
+  'login': function(args) {
+    if (isLoggedIn) {
+      return 'You are already logged in. Please log off first.';
+    }
+    if (args.length === 0) {
+      return 'Usage: login <username> [password]';
+    }
+    const username = args[0];
+    const password = args[1] || '';
+    if (users.hasOwnProperty(username)) {
+      if (users[username].password && users[username].password !== password) {
+        return 'Login incorrect';
+      }
+      currentUser = username;
+      isRoot = (username === 'root');
+      loginMethod = 'login';
+      currentDirectory = '/';
+      isLoggedIn = true;
+      updatePrompt();
+      return `Logged in as ${username}.`;
+    } else {
+      return `User ${username} does not exist.`;
+    }
+  },
+  'logoff': function() {
+    if (!isLoggedIn) {
+      return 'You are not logged in.';
+    }
+    isLoggedIn = false;
+    currentUser = null;
+    isRoot = false;
+    loginMethod = 'default';
+    currentDirectory = '/';
+    updatePrompt();
+    output.innerHTML = ''; // Clear the terminal output
+    return 'Logged off. Please login using "login <username> [password]".';
+  },
+  'create-user': function(args) {
+    if (!users[currentUser].fileSystem['/']['apt-pkgs'] || !users[currentUser].fileSystem['/']['apt-pkgs'].hasOwnProperty('userman')) {
+      return 'create-user: command not found';
+    }
+    if (!isRoot) {
+      return 'Error: Root permissions required to create a user.';
+    }
+    if (args.length < 1 || args.length > 2) {
+      return 'Usage: create-user <username> [password]';
+    }
+    const username = args[0];
+    const password = args[1] || '';
+    if (users.hasOwnProperty(username)) {
+      return `User '${username}' already exists.`;
+    }
+    users[username] = {
+      password: password,
+      fileSystem: {
+        '/': {
+          'home': {
+            [username]: {}
+          },
+          'apt-pkgs': {}
+        }
+      }
+    };
+    return `User '${username}' created successfully.`;
+  },
+  'delete-user': function(args) {
+    if (!users[currentUser].fileSystem['/']['apt-pkgs'] || !users[currentUser].fileSystem['/']['apt-pkgs'].hasOwnProperty('userman')) {
+      return 'delete-user: command not found';
+    }
+    if (!isRoot) {
+      return 'Error: Root permissions required to delete a user.';
+    }
+    if (args.length !== 1) {
+      return 'Usage: delete-user <username>';
+    }
+    const username = args[0];
+    if (!users.hasOwnProperty(username)) {
+      return `User '${username}' does not exist.`;
+    }
+    if (username === 'root' || username === 'user') {
+      return `Cannot delete system user '${username}'.`;
+    }
+    delete users[username];
+    return `User '${username}' deleted successfully.`;
+  },
+  'passwd': function(args) {
+    if (!users[currentUser].fileSystem['/']['apt-pkgs'] || !users[currentUser].fileSystem['/']['apt-pkgs'].hasOwnProperty('userman')) {
+      return 'passwd: command not found';
+    }
+    if (args.length !== 2) {
+      return 'Usage: passwd <username> <new_password>';
+    }
+    const username = args[0];
+    const newPassword = args[1];
+    if (!users.hasOwnProperty(username)) {
+      return `User '${username}' does not exist.`;
+    }
+    if (!isRoot && currentUser !== username) {
+      return 'Error: You can only change your own password unless you are root.';
+    }
+    users[username].password = newPassword;
+    return `Password for user '${username}' changed successfully.`;
+  },
+  'kernel-panic': function() {
+    isKernelPanic = true;
+    kernelPanic.style.display = 'block';
+    return 'Kernel panic triggered. System halted.';
   }
 };
 
-function addOutput(text) {
-  const line = document.createElement('div');
-  line.className = 'output-line';
-  line.textContent = text;
-  output.appendChild(line);
-  
-  // Remove old lines if there are too many
-  while (output.scrollHeight > output.clientHeight) {
-    output.removeChild(output.firstChild);
+function aptInstall(packages) {
+  if (packages.length === 0) {
+    return 'E: No package specified';
   }
-
-  // Scroll to the bottom
-  output.scrollTop = output.scrollHeight;
-}
-
-function getDirectory(path) {
-  let dir = fileSystem;
-  let parts = path.split('/').filter(Boolean);
-  for (let part of parts) {
-    if (dir[part] === undefined) {
-      return undefined;
-    }
-    dir = dir[part];
-  }
-  return dir;
-}
-
-function resolvePath(path) {
-  if (path.startsWith('/')) return path;
-  let resolvedPath = `${currentDirectory}${currentDirectory.endsWith('/') ? '' : '/'}${path}`;
-  let normalizedPath = [];
-  resolvedPath.split('/').forEach(part => {
-    if (part === '..') {
-      normalizedPath.pop();
-    } else if (part && part !== '.') {
-      normalizedPath.push(part);
-    }
-  });
-  return '/' + normalizedPath.join('/');
-}
-
-function directoryExists(path) {
-  let dir = getDirectory(path);
-  return typeof dir === 'object' && dir !== null;
-}
-
-function getParentDirectory(path) {
-  let parts = path.split('/').filter(Boolean);
-  parts.pop();
-  return getDirectory('/' + parts.join('/'));
-}
-
-function getFile(path) {
-  let dir = getParentDirectory(path);
-  if (!dir) return undefined;
-  let fileName = path.split('/').pop();
-  return dir[fileName];
-}
-
-function openNanoEditor(path, content) {
-  nanoContent.value = content;
-  nanoFilename.textContent = path || '[New File]';
-  nanoEditor.style.display = 'block';
-  nanoContent.focus();
-}
-
-function closeNanoEditor(save = false) {
-  if (save) {
-    saveNanoContent();
-  } else {
-    nanoEditor.style.display = 'none';
-    userInput.focus();
-  }
-}
-
-function saveNanoContent() {
-  let path = nanoFilename.textContent;
-  if (path === '[New File]') {
-    nanoPromptText.textContent = 'File Name to Write: ';
-    nanoPrompt.style.display = 'block';
-    nanoPromptInput.focus();
-  } else {
-    let parentDir = getParentDirectory(path);
-    let fileName = path.split('/').pop();
-    if (parentDir) {
-      parentDir[fileName] = nanoContent.value;
-      updateUsedStorage();
-      nanoEditor.style.display = 'none';
-      userInput.focus();
-    } else {
-      addOutput(`Error: Cannot save file to ${path}`);
-    }
-  }
-}
-
-function updatePrompt() {
-  let user = isRoot ? 'root' : 'user';
-  prompt.textContent = `${user}@debian:${currentDirectory}$ `;
-}
-
-function findCustomCommands() {
-  let customCommands = [];
-  function searchDir(dir) {
-    for (let key in dir) {
-      if (typeof dir[key] === 'string' && (key.endsWith('.cmdtxt') || key.endsWith('.cmdjs') || key.endsWith('.nand'))) {
-        customCommands.push(key);
-      } else if (typeof dir[key] === 'object') {
-        searchDir(dir[key]);
-      }
-    }
-  }
-  searchDir(fileSystem);
-  return customCommands;
-}
-
-function executeCustomCommand(command, args) {
-  let path = findCustomCommandPath(command);
-  if (!path) return `Command not found: ${command}`;
-
-  let file = getFile(path);
-  if (!file) return `Error: File not found at ${path}`;
-
-  if (path.endsWith('.cmdtxt')) {
-    return file;
-  } else if (path.endsWith('.cmdjs')) {
-    try {
-      return eval(file);
-    } catch (error) {
-      return `Error executing ${command}: ${error.message}`;
-    }
-  } else if (path.endsWith('.nand')) {
-    return executeNandCommand(file, isRoot);
-  }
-}
-
-function executeNandCommand(content, isRoot) {
   let output = '';
-  let inNof = false;
-  let inFirm = false;
-  let lines = content.split('\n');
-  for (let line of lines) {
-    line = line.trim();
-    if (line === '<nof>') {
-      inNof = true;
-      inFirm = false;
-    } else if (line === '</nof>') {
-      inNof = false;
-    } else if (line === '<firm>') {
-      inNof = false;
-      inFirm = true;
-    } else if (line === '</firm>') {
-      inFirm = false;
-    } else if (inNof) {
-      if (line.startsWith('<txt>') && line.endsWith('</txt>')) {
-        output += line.slice(5, -6) + '\n';
-      } else if (line === '') {
-        // Ignore empty lines in <nof> section
-        continue;
-      } else {
-        output += `Error in .nand file: Invalid syntax in <nof> section: ${line}\n`;
+  for (let pkg of packages) {
+    if (availablePackages.hasOwnProperty(pkg)) {
+      if (!users[currentUser].fileSystem['/']['apt-pkgs']) {
+        users[currentUser].fileSystem['/']['apt-pkgs'] = {};
       }
-    } else if (inFirm) {
-      if (!isRoot) {
-        output += 'Error: Root permissions required for <firm> section\n';
-      } else if (line.startsWith('<txt>') && line.endsWith('</txt>')) {
-        output += line.slice(5, -6) + '\n';
-      } else if (line.startsWith('<js>') && line.endsWith('</js>')) {
-        let script = line.slice(4, -5).trim();
-        if (script !== '<! Your Script Here !>') {
-          try {
-            output += eval(script) + '\n';
-          } catch (error) {
-            output += `Error executing JS: ${error.message}\n`;
-          }
-        } else {
-          output += 'Placeholder JavaScript not executed.\n';
-        }
-      } else if (line === '') {
-        // Ignore empty lines in <firm> section
-        continue;
+      if (users[currentUser].fileSystem['/']['apt-pkgs'].hasOwnProperty(pkg)) {
+        output += `${pkg} is already installed.\n`;
       } else {
-        output += `Error in .nand file: Invalid syntax in <firm> section: ${line}\n`;
+        const size = availablePackages[pkg].size;
+        const downloadTime = (size / currentNetworkSpeed) * 1000; // in milliseconds
+        output += `Installing ${pkg}...\n`;
+        
+        showProgressBar(pkg);
+        
+        // Create a closure to capture the current package
+        (function(currentPkg) {
+          let downloadedBytes = 0;
+          const intervalId = setInterval(() => {
+            downloadedBytes += currentNetworkSpeed / 10; // 100ms worth of data
+            const progress = (downloadedBytes / size) * 100;
+            if (progress <= 100) {
+              updateProgressBar(progress, currentPkg);
+            }
+            if (progress >= 100) {
+              clearInterval(intervalId);
+              users[currentUser].fileSystem['/']['apt-pkgs'][currentPkg] = availablePackages[currentPkg].content;
+              updateUsedStorage();
+              hideProgressBar();
+              addOutput(`${currentPkg} has been installed.`);
+              // Add the command to the global commands object
+              commands[currentPkg] = function() {
+                return users[currentUser].fileSystem['/']['apt-pkgs'][currentPkg];
+              };
+            }
+          }, 100);
+        })(pkg);
+        
+        output += `${pkg} will be installed in approximately ${(downloadTime / 1000).toFixed(2)} seconds.\n`;
       }
-    } else if (line === '') {
-      // Ignore empty lines outside of sections
-      continue;
     } else {
-      output += `Error in .nand file: Content outside of <nof> or <firm> sections: ${line}\n`;
+      output += `E: Unable to locate package ${pkg}\n`;
     }
   }
   return output.trim();
 }
 
-function findCustomCommandPath(command) {
-  let customCommands = findCustomCommands();
-  let matchingCommand = customCommands.find(cmd => cmd.replace('.cmdtxt', '').replace('.cmdjs', '').replace('.nand', '') === command);
-  if (matchingCommand) {
-    function searchDir(dir, path = '') {
-      for (let key in dir) {
-        if (key === matchingCommand) {
-          return path + '/' + key;
-        } else if (typeof dir[key] === 'object') {
-          let result = searchDir(dir[key], path + '/' + key);
-          if (result) return result;
-        }
-      }
-      return null;
-    }
-    return searchDir(fileSystem).slice(1); // Remove leading slash
+function aptSearch(terms) {
+  if (terms.length === 0) {
+    return Object.keys(availablePackages).join('\n');
   }
-  return null;
+  let results = [];
+  for (let pkg in availablePackages) {
+    if (terms.some(term => pkg.includes(term))) {
+      results.push(pkg);
+    }
+  }
+  return results.length > 0 ? results.join('\n') : 'No packages found';
 }
 
-userInput.addEventListener('keydown', function(event) {
-  if (event.key === 'Enter') {
-    const command = userInput.value.trim();
-    const parts = command.split(' ');
-    const cmd = parts[0];
-    const args = parts.slice(1);
-
-    addOutput(`${prompt.textContent}${command}`);
-
-    if (commands.hasOwnProperty(cmd)) {
-      const result = typeof commands[cmd] === 'function' ? commands[cmd](args) : commands[cmd];
-      addOutput(result);
-    } else {
-      const customResult = executeCustomCommand(cmd, args);
-      addOutput(customResult);
-    }
-
-    updatePrompt();
-    userInput.value = '';
+function aptRemove(packages) {
+  if (packages.length === 0) {
+    return 'E: No package specified';
   }
-});
-
-document.addEventListener('keydown', function(event) {
-  if (event.ctrlKey && event.key === 'x' && nanoEditor.style.display === 'block') {
-    if (nanoFilename.textContent === '[New File]') {
-      nanoPromptText.textContent = 'File Name to Write: ';
-      nanoPrompt.style.display = 'block';
-      nanoPromptInput.focus();
+  let output = '';
+  for (let pkg of packages) {
+    if (users[currentUser].fileSystem['/']['apt-pkgs'] && users[currentUser].fileSystem['/']['apt-pkgs'].hasOwnProperty(pkg)) {
+      delete users[currentUser].fileSystem['/']['apt-pkgs'][pkg];
+      delete commands[pkg];
+      updateUsedStorage();
+      output += `${pkg} has been removed.\n`;
     } else {
-      saveNanoContent();
+      output += `E: Package '${pkg}' is not installed.\n`;
     }
   }
-});
+  return output.trim();
+}
 
-nanoPromptInput.addEventListener('keydown', function(event) {
-  if (event.key === 'Enter') {
-    let fileName = nanoPromptInput.value.trim();
-    if (fileName) {
-      let path = resolvePath(fileName);
-      let parts = path.split('/');
-      let parentPath = parts.slice(0, -1).join('/');
-      let finalFileName = parts[parts.length - 1];
-      
-      // Create parent directories if they don't exist
-      let currentPath = '';
-      for (let part of parts.slice(0, -1)) {
-        currentPath += '/' + part;
-        if (!directoryExists(currentPath)) {
-          commands.mkdir([currentPath]);
+function aptPackages() {
+  if (!users[currentUser].fileSystem['/']['apt-pkgs']) {
+    return 'No packages installed.';
+  }
+  return Object.keys(users[currentUser].fileSystem['/']['apt-pkgs']).join('\n');
+}
+
+function showProgressBar(packageName) {
+  progressBar.style.display = 'block';
+  progressText.textContent = `Downloading ${packageName}...`;
+}
+
+function updateProgressBar(progress, packageName) {
+  progressFill.style.width = `${progress}%`;
+  progressText.textContent = `Downloading ${packageName}... ${progress.toFixed(2)}%`;
+}
+
+function hideProgressBar() {
+  progressBar.style.display = 'none';
+}
+
+function getDirectory(path) {
+  let current = users[currentUser].fileSystem;
+  const parts = path.split('/').filter(p => p);
+  for (let part of parts) {
+    if (current[part] === undefined) {
+      return undefined;
+    }
+    current = current[part];
+  }
+  return current;
+}
+
+function getParentDirectory(path) {
+  const parts = path.split('/');
+  parts.pop();
+  return getDirectory(parts.join('/'));
+}
+
+function getFile(path) {
+  const dir = getParentDirectory(path);
+  const fileName = path.split('/').pop();
+  return dir ? dir[fileName] : undefined;
+}
+
+function resolvePath(path) {
+  if (path.startsWith('/')) {
+    return path;
+  } else {
+    return currentDirectory + (currentDirectory.endsWith('/') ? '' : '/') + path;
+  }
+}
+
+function directoryExists(path) {
+  return getDirectory(path) !== undefined;
+}
+
+function updatePrompt() {
+  prompt.textContent = `${currentUser}@debian:${currentDirectory}$ `;
+}
+
+function findCustomCommands() {
+  const customCommands = [];
+  function searchDirectory(dir, path = '') {
+    for (const [name, content] of Object.entries(dir)) {
+      if (typeof content === 'object') {
+        searchDirectory(content, `${path}/${name}`);
+      } else if (typeof content === 'string' && (name.endsWith('.cmdtxt') || name.endsWith('.cmdjs') || name.endsWith('.nand'))) {
+        customCommands.push(`${path}/${name}`);
+      }
+    }
+  }
+  searchDirectory(users[currentUser].fileSystem);
+  return customCommands;
+}
+
+function executeCustomCommand(command, args) {
+  const customCommands = findCustomCommands();
+  const commandFile = customCommands.find(cmd => cmd.endsWith(`/${command}.cmdtxt`) || cmd.endsWith(`/${command}.cmdjs`) || cmd.endsWith(`/${command}.nand`));
+  
+  if (!commandFile) {
+    return `Command not found: ${command}`;
+  }
+
+  const fileContent = getFile(commandFile);
+  const fileExtension = commandFile.split('.').pop();
+
+  switch (fileExtension) {
+    case 'cmdtxt':
+      return fileContent;
+    case 'cmdjs':
+      try {
+        const result = new Function('args', fileContent)(args);
+        return result !== undefined ? result.toString() : '';
+      } catch (error) {
+        return `Error executing ${command}: ${error.message}`;
+      }
+    case 'nand':
+      const parts = fileContent.split(/(<(?:nof|txt|firm|js)>[\s\S]*?<\/(?:nof|txt|firm|js)>)/);
+      let output = '';
+      for (const part of parts) {
+        if (part.startsWith('<nof>')) {
+          output += part.replace(/<\/?nof>/g, '');
+        } else if (part.startsWith('<txt>')) {
+          output += part.replace(/<\/?txt>/g, '');
+        } else if (part.startsWith('<firm>')) {
+          if (isRoot) {
+            output += part.replace(/<\/?firm>/g, '');
+          } else {
+            return 'Error: Root permissions required for firmware operations.';
+          }
+        } else if (part.startsWith('<js>')) {
+          if (isRoot) {
+            try {
+              const jsContent = part.replace(/<\/?js>/g, '');
+              const result = new Function('args', jsContent)(args);
+              output += result !== undefined ? result.toString() : '';
+            } catch (error) {
+              return `Error executing JavaScript in ${command}: ${error.message}`;
+            }
+          } else {
+            return 'Error: Root permissions required for JavaScript execution.';
+          }
+        } else {
+          output += part;
         }
       }
+      return output;
+    default:
+      return `Unknown file type for command: ${command}`;
+  }
+}
 
-      let parentDir = getParentDirectory(path);
-      if (parentDir) {
-        parentDir[finalFileName] = nanoContent.value;
-        updateUsedStorage();
-        closeNanoEditor(false);
-      } else {
-        addOutput(`Error: Cannot save file to ${path}`);
-      }
+function executeCommand(input) {
+  const [command, ...args] = input.trim().split(/\s+/);
+  
+  if (isKernelPanic) {
+    return 'System halted. Kernel panic state.';
+  }
+
+  if (commands.hasOwnProperty(command)) {
+    if (typeof commands[command] === 'function') {
+      return commands[command](args);
+    } else {
+      return commands[command];
     }
-    nanoPrompt.style.display = 'none';
-    nanoPromptInput.value = '';
+  } else {
+    return executeCustomCommand(command, args);
+  }
+}
+
+function addOutput(text) {
+  const outputLine = document.createElement('div');
+  outputLine.className = 'output-line';
+  outputLine.textContent = text;
+  output.appendChild(outputLine);
+  output.scrollTop = output.scrollHeight;
+}
+
+function openNanoEditor(filename, content) {
+  nanoEditor.style.display = 'block';
+  nanoContent.value = content;
+  nanoFilename.textContent = filename;
+  nanoContent.focus();
+}
+
+function closeNanoEditor() {
+  nanoEditor.style.display = 'none';
+  const filename = nanoFilename.textContent;
+  if (filename) {
+    const content = nanoContent.value;
+    const parentDir = getParentDirectory(filename);
+    if (parentDir) {
+      parentDir[filename.split('/').pop()] = content;
+      updateUsedStorage();
+    }
+  }
+}
+
+nanoContent.addEventListener('keydown', function(event) {
+  if (event.ctrlKey && event.key === 'x') {
+    event.preventDefault();
+    closeNanoEditor();
   }
 });
 
-addOutput('Welcome to Debian 12.6.0 Custom Edition!');
-addOutput('Type "help" for a list of available commands.');
+function displayHelpMessage() {
+  addOutput('Welcome to Debian 12.6.0 Custom Edition Terminal');
+  addOutput('Type "help" for a list of available commands.');
+}
+
+userInput.addEventListener('keyup', function(event) {
+  if (event.key === 'Enter') {
+    const input = userInput.value;
+    addOutput(prompt.textContent + input);
+    const result = executeCommand(input);
+    if (result) {
+      addOutput(result);
+    }
+    userInput.value = '';
+    output.scrollTop = output.scrollHeight;
+  }
+});
+
+// Initialize the terminal
 updatePrompt();
+displayHelpMessage();
+
+// Simulate network speed fluctuations
+setInterval(() => {
+  const fluctuation = Math.random() * 0.2 - 0.1; // -10% to +10%
+  currentNetworkSpeed = stableNetworkSpeed * (1 + fluctuation);
+}, 1000);
+
 </script>
 </body>
 </html>
