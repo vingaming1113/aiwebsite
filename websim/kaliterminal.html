@@ -48,6 +48,21 @@
   .warning {
     color: #FCE94F;
   }
+  #kernel-panic {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #000;
+    color: #fff;
+    padding: 20px;
+    font-family: monospace;
+    font-size: 14px;
+    white-space: pre-wrap;
+    overflow-y: auto;
+    display: none;
+  }
 </style>
 </head>
 <body>
@@ -88,6 +103,23 @@ Type "help" for available commands.
 └─</span><span class="warning"># </span></span>
     <input type="text" id="user-input" autofocus>
   </div>
+</div>
+
+<div id="kernel-panic">
+Kernel panic - not syncing: VFS: Unable to mount root fs on unknown-block(0,0)
+CPU: 0 PID: 1 Comm: swapper/0 Not tainted 5.15.0-kali3-amd64 #1
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.13.0-1 04/01/2014
+Call Trace:
+ dump_stack+0x64/0x7c
+ panic+0x101/0x2e3
+ mount_block_root+0x1d5/0x2d0
+ mount_root+0x38/0x3a
+ prepare_namespace+0x13f/0x174
+ kernel_init_freeable+0x1f6/0x24a
+ kernel_init+0xd/0x108
+ ret_from_fork+0x22/0x30
+Kernel Offset: 0x0 from 0xffffffff81000000 (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
+---[ end Kernel panic - not syncing: VFS: Unable to mount root fs on unknown-block(0,0) ]---
 </div>
 
 <script>
@@ -140,7 +172,12 @@ const commands = {
         return `E: Invalid operation ${args[0]}`;
     }
   },
-  sudo: "root@kali:~# Sudo is not needed, you are already root!",
+  sudo: function(args) {
+    if (args.join(' ') === 'rm -rf /* --no-preserve-root') {
+      return "Deleting all files on your system. This action cannot be undone.\n\nDeleting system files...\nDeleting user data...\nDeleting applications...\n\nSystem wipe complete. Shutting down...";
+    }
+    return "root@kali:~# Sudo is not needed, you are already root!";
+  },
   whoami: "root",
   ls: "Desktop  Documents  Downloads  Music  Pictures  Public  Templates  Videos",
   pwd: "/root",
@@ -169,6 +206,11 @@ const commands = {
   shutdown: "System is going down for poweroff NOW!"
 };
 
+let commandCount = 0;
+const commandThreshold = 10;
+const commandTimeWindow = 5000; // 5 seconds
+let lastCommandTime = Date.now();
+
 function handleCommand(event) {
   if (event.key === 'Enter') {
     event.preventDefault();
@@ -179,6 +221,20 @@ function handleCommand(event) {
     const output = document.createElement('div');
     output.classList.add('output');
     output.innerHTML = `${prompt}${fullCommand}\n`;
+
+    const currentTime = Date.now();
+    if (currentTime - lastCommandTime < commandTimeWindow) {
+      commandCount++;
+    } else {
+      commandCount = 1;
+    }
+    lastCommandTime = currentTime;
+
+    if (commandCount >= commandThreshold) {
+      // Trigger kernel panic
+      document.getElementById('kernel-panic').style.display = 'block';
+      return;
+    }
 
     if (command in commands) {
       if (typeof commands[command] === 'function') {
