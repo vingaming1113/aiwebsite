@@ -793,52 +793,41 @@ function aptPackages() {
   if (!users[currentUser].fileSystem['/']['apt-pkgs']) {
     return 'No packages installed.';
   }
-  return Object.keys(users[currentUser].fileSystem['/']['apt-pkgs']).join('\n');
-}
-
-function showProgressBar(packageName) {
-  progressBar.style.display = 'block';
-  progressText.textContent = `Downloading ${packageName}...`;
-}
-
-function updateProgressBar(progress, packageName) {
-  progressFill.style.width = `${progress}%`;
-  progressText.textContent = `Downloading ${packageName}... ${progress.toFixed(2)}%`;
-}
-
-function hideProgressBar() {
-  progressBar.style.display = 'none';
+  const installedPackages = Object.keys(users[currentUser].fileSystem['/']['apt-pkgs']);
+  return installedPackages.length > 0 ? installedPackages.join('\n') : 'No packages installed.';
 }
 
 function getDirectory(path) {
-  let current = users[currentUser].fileSystem;
+  let current = users[currentUser].fileSystem['/'];
+  if (path === '/') return current;
   const parts = path.split('/').filter(p => p);
   for (let part of parts) {
-    if (current[part] === undefined) {
+    if (current.hasOwnProperty(part)) {
+      current = current[part];
+    } else {
       return undefined;
     }
-    current = current[part];
   }
   return current;
 }
 
 function getParentDirectory(path) {
-  const parts = path.split('/');
-  parts.pop();
-  return getDirectory(parts.join('/'));
+  const parts = path.split('/').filter(p => p);
+  const parentPath = '/' + parts.slice(0, -1).join('/');
+  return getDirectory(parentPath);
 }
 
 function getFile(path) {
   const dir = getParentDirectory(path);
   const fileName = path.split('/').pop();
-  return dir ? dir[fileName] : undefined;
+  return dir && dir.hasOwnProperty(fileName) ? dir[fileName] : undefined;
 }
 
 function resolvePath(path) {
   if (path.startsWith('/')) {
     return path;
   } else {
-    return currentDirectory + (currentDirectory.endsWith('/') ? '' : '/') + path;
+    return `${currentDirectory}${currentDirectory.endsWith('/') ? '' : '/'}${path}`;
   }
 }
 
@@ -850,159 +839,188 @@ function updatePrompt() {
   prompt.textContent = `${currentUser}@debian:${currentDirectory}$ `;
 }
 
-function findCustomCommands() {
-  const customCommands = [];
-  function searchDirectory(dir, path = '') {
-    for (const [name, content] of Object.entries(dir)) {
-      if (typeof content === 'object') {
-        searchDirectory(content, `${path}/${name}`);
-      } else if (typeof content === 'string' && (name.endsWith('.cmdtxt') || name.endsWith('.cmdjs') || name.endsWith('.nand'))) {
-        customCommands.push(`${path}/${name}`);
-      }
-    }
-  }
-  searchDirectory(users[currentUser].fileSystem);
-  return customCommands;
-}
-
-function executeCustomCommand(command, args) {
-  const customCommands = findCustomCommands();
-  const commandFile = customCommands.find(cmd => cmd.endsWith(`/${command}.cmdtxt`) || cmd.endsWith(`/${command}.cmdjs`) || cmd.endsWith(`/${command}.nand`));
-  
-  if (!commandFile) {
-    return `Command not found: ${command}`;
-  }
-
-  const fileContent = getFile(commandFile);
-  const fileExtension = commandFile.split('.').pop();
-
-  switch (fileExtension) {
-    case 'cmdtxt':
-      return fileContent;
-    case 'cmdjs':
-      try {
-        const result = new Function('args', fileContent)(args);
-        return result !== undefined ? result.toString() : '';
-      } catch (error) {
-        return `Error executing ${command}: ${error.message}`;
-      }
-    case 'nand':
-      const parts = fileContent.split(/(<(?:nof|txt|firm|js)>[\s\S]*?<\/(?:nof|txt|firm|js)>)/);
-      let output = '';
-      for (const part of parts) {
-        if (part.startsWith('<nof>')) {
-          output += part.replace(/<\/?nof>/g, '');
-        } else if (part.startsWith('<txt>')) {
-          output += part.replace(/<\/?txt>/g, '');
-        } else if (part.startsWith('<firm>')) {
-          if (isRoot) {
-            output += part.replace(/<\/?firm>/g, '');
-          } else {
-            return 'Error: Root permissions required for firmware operations.';
-          }
-        } else if (part.startsWith('<js>')) {
-          if (isRoot) {
-            try {
-              const jsContent = part.replace(/<\/?js>/g, '');
-              const result = new Function('args', jsContent)(args);
-              output += result !== undefined ? result.toString() : '';
-            } catch (error) {
-              return `Error executing JavaScript in ${command}: ${error.message}`;
-            }
-          } else {
-            return 'Error: Root permissions required for JavaScript execution.';
-          }
-        } else {
-          output += part;
-        }
-      }
-      return output;
-    default:
-      return `Unknown file type for command: ${command}`;
-  }
-}
-
-function executeCommand(input) {
-  const [command, ...args] = input.trim().split(/\s+/);
-  
-  if (isKernelPanic) {
-    return 'System halted. Kernel panic state.';
-  }
-
-  if (commands.hasOwnProperty(command)) {
-    if (typeof commands[command] === 'function') {
-      return commands[command](args);
-    } else {
-      return commands[command];
-    }
-  } else {
-    return executeCustomCommand(command, args);
-  }
-}
-
-function addOutput(text) {
-  const outputLine = document.createElement('div');
-  outputLine.className = 'output-line';
-  outputLine.textContent = text;
-  output.appendChild(outputLine);
-  output.scrollTop = output.scrollHeight;
-}
-
 function openNanoEditor(filename, content) {
-  nanoEditor.style.display = 'block';
   nanoContent.value = content;
   nanoFilename.textContent = filename;
+  nanoEditor.style.display = 'block';
   nanoContent.focus();
 }
 
 function closeNanoEditor() {
   nanoEditor.style.display = 'none';
-  const filename = nanoFilename.textContent;
-  if (filename) {
-    const content = nanoContent.value;
-    const parentDir = getParentDirectory(filename);
-    if (parentDir) {
-      parentDir[filename.split('/').pop()] = content;
-      updateUsedStorage();
+}
+
+function showProgressBar(name) {
+  progressBar.style.display = 'block';
+  progressText.textContent = `Downloading ${name}... 0%`;
+}
+
+function updateProgressBar(progress, name) {
+  progressFill.style.width = `${progress}%`;
+  progressText.textContent = `Downloading ${name}... ${progress.toFixed(1)}%`;
+}
+
+function hideProgressBar() {
+  progressBar.style.display = 'none';
+}
+
+function findCustomCommands() {
+  let customCommands = [];
+  function searchDirectory(dir) {
+    for (let item in dir) {
+      if (typeof dir[item] === 'string' && (item.endsWith('.cmdtxt') || item.endsWith('.cmdjs') || item.endsWith('.nand'))) {
+        customCommands.push(item);
+      } else if (typeof dir[item] === 'object') {
+        searchDirectory(dir[item]);
+      }
     }
   }
+  searchDirectory(users[currentUser].fileSystem['/']);
+  return customCommands;
 }
+
+function executeCommand(input) {
+  const [cmd, ...args] = input.trim().split(/\s+/);
+  if (commands.hasOwnProperty(cmd)) {
+    if (typeof commands[cmd] === 'function') {
+      return commands[cmd](args);
+    } else {
+      return commands[cmd];
+    }
+  } else {
+    // Check for custom commands
+    const customCommands = findCustomCommands();
+    const matchingCommand = customCommands.find(c => c.startsWith(cmd));
+    if (matchingCommand) {
+      const commandContent = getFile(resolvePath(matchingCommand));
+      if (commandContent) {
+        if (matchingCommand.endsWith('.cmdtxt')) {
+          return commandContent;
+        } else if (matchingCommand.endsWith('.cmdjs')) {
+          try {
+            return new Function('args', commandContent)(args);
+          } catch (error) {
+            return `Error executing ${matchingCommand}: ${error.message}`;
+          }
+        } else if (matchingCommand.endsWith('.nand')) {
+          const parts = commandContent.split(/(<nof>|<txt>|<firm>|<js>)/);
+          let output = '';
+          for (let i = 1; i < parts.length; i += 2) {
+            const tag = parts[i];
+            const content = parts[i + 1];
+            switch (tag) {
+              case '<nof>':
+              case '<txt>':
+                output += content + '\n';
+                break;
+              case '<firm>':
+              case '<js>':
+                if (isRoot) {
+                  try {
+                    output += (new Function('args', content)(args) || '') + '\n';
+                  } catch (error) {
+                    output += `Error executing ${tag} part: ${error.message}\n`;
+                  }
+                } else {
+                  output += `Error: Root permissions required to execute ${tag} part.\n`;
+                }
+                break;
+            }
+          }
+          return output.trim();
+        }
+      }
+    }
+    return `${cmd}: command not found`;
+  }
+}
+
+function addOutput(text) {
+  const outputLine = document.createElement('div');
+  outputLine.classList.add('output-line');
+  outputLine.textContent = text;
+  output.appendChild(outputLine);
+  output.scrollTop = output.scrollHeight;
+}
+
+userInput.addEventListener('keydown', function(event) {
+  if (event.key === 'Enter') {
+    event.preventDefault();
+    const input = userInput.value;
+    addOutput(`${prompt.textContent}${input}`);
+    if (!isLoggedIn && input.startsWith('login ')) {
+      const result = executeCommand(input);
+      addOutput(result);
+    } else if (isLoggedIn && !isKernelPanic) {
+      const result = executeCommand(input);
+      addOutput(result);
+    } else if (isKernelPanic) {
+      addOutput('System is in kernel panic state. Reboot required.');
+    } else {
+      addOutput('You must login first. Use the "login" command.');
+    }
+    userInput.value = '';
+  }
+});
 
 nanoContent.addEventListener('keydown', function(event) {
   if (event.ctrlKey && event.key === 'x') {
     event.preventDefault();
+    const filename = nanoFilename.textContent;
+    const content = nanoContent.value;
+    if (filename) {
+      const path = resolvePath(filename);
+      const parentDir = getParentDirectory(path);
+      const name = path.split('/').pop();
+      if (parentDir) {
+        parentDir[name] = content;
+        updateUsedStorage();
+        addOutput(`File '${filename}' saved.`);
+      } else {
+        addOutput(`Error: Unable to save file '${filename}'.`);
+      }
+    }
     closeNanoEditor();
+    userInput.focus();
   }
 });
 
-function displayHelpMessage() {
-  addOutput('Welcome to Debian 12.6.0 Custom Edition Terminal');
-  addOutput('Type "help" for a list of available commands.');
+// Function to update network speed
+function updateNetworkSpeed() {
+  const minSpeed = stableNetworkSpeed * 0.2; // 80% less than stable speed
+  const maxSpeed = stableNetworkSpeed * 1.85; // 85% more than stable speed
+  currentNetworkSpeed = Math.random() * (maxSpeed - minSpeed) + minSpeed;
 }
 
-userInput.addEventListener('keyup', function(event) {
-  if (event.key === 'Enter') {
-    const input = userInput.value;
-    addOutput(prompt.textContent + input);
-    const result = executeCommand(input);
-    if (result) {
-      addOutput(result);
-    }
-    userInput.value = '';
-    output.scrollTop = output.scrollHeight;
-  }
-});
+// Update network speed every 0.2 seconds
+setInterval(updateNetworkSpeed, 200);
 
-// Initialize the terminal
+// Initial setup
 updatePrompt();
-displayHelpMessage();
+addOutput('Welcome to Debian 12.6.0 Custom Edition');
+addOutput('Type "help" for a list of available commands.');
 
-// Simulate network speed fluctuations
-setInterval(() => {
-  const fluctuation = Math.random() * 0.2 - 0.1; // -10% to +10%
-  currentNetworkSpeed = stableNetworkSpeed * (1 + fluctuation);
-}, 1000);
-
+// Export necessary functions and variables for testing
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {
+    executeCommand,
+    commands,
+    users,
+    currentUser,
+    isRoot,
+    currentDirectory,
+    resolvePath,
+    getDirectory,
+    getFile,
+    updateUsedStorage,
+    TOTAL_STORAGE,
+    aptInstall,
+    aptSearch,
+    aptRemove,
+    aptPackages,
+    availablePackages
+  };
+}
 </script>
 </body>
 </html>
