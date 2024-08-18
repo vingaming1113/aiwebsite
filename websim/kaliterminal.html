@@ -5,9 +5,9 @@
     margin: 0;
     padding: 0;
     height: 100%;
-    background-color: #000;
-    color: #00ff00;
-    font-family: 'Courier New', monospace;
+    background-color: #0C0C0C;
+    color: #D3D7CF;
+    font-family: 'DejaVu Sans Mono', 'Courier New', monospace;
     font-size: 14px;
     overflow: hidden;
   }
@@ -23,14 +23,14 @@
     align-items: center;
   }
   #prompt {
-    color: #00ff00;
+    color: #729FCF;
     margin-right: 5px;
   }
   #user-input {
     background: transparent;
     border: none;
-    color: #00ff00;
-    font-family: 'Courier New', monospace;
+    color: #D3D7CF;
+    font-family: 'DejaVu Sans Mono', 'Courier New', monospace;
     font-size: 14px;
     outline: none;
     width: 100%;
@@ -39,18 +39,25 @@
     white-space: pre-wrap;
     word-wrap: break-word;
   }
+  .success {
+    color: #8AE234;
+  }
+  .error {
+    color: #EF2929;
+  }
+  .warning {
+    color: #FCE94F;
+  }
 </style>
 </head>
 <body>
 <div id="terminal">
-  <div class="output">Welcome to Kali Linux!
-
-Kali Linux 2023.2 tty1
+  <div class="output">
+Kali GNU/Linux Rolling kali tty1
 
 kali login: root
 Password: 
-
-Last login: Thu Jun 15 10:30:15 UTC 2023 on tty1
+Last login: Wed May 10 15:30:45 UTC 2023 on tty1
 Linux kali 5.15.0-kali3-amd64 #1 SMP Debian 5.15.15-2kali1 (2022-01-31) x86_64
 
 The programs included with the Kali GNU/Linux system are free software;
@@ -59,142 +66,148 @@ individual files in /usr/share/doc/*/copyright.
 
 Kali GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
 permitted by applicable law.
-</div>
+
+┌──(root㉿kali)-[~]
+└─# Welcome to Kali Linux!
+
+Kali Linux 2023.1 (GNU/Linux 5.15.0-kali3-amd64 x86_64)
+
+* Website:  https://www.kali.org
+* Support:  https://forums.kali.org
+* Docs:     https://www.kali.org/docs/
+* Training: https://kali.training
+
+For more information about Kali Linux, visit:
+https://www.kali.org/docs/introduction/kali-linux-introduction/
+
+Type "help" for available commands.
+
+  </div>
   <div id="input-line">
-    <span id="prompt">root@kali:~#</span>
+    <span id="prompt"><span class="success">┌──(</span><span class="warning">root㉿kali</span><span class="success">)-[</span><span class="error">~</span><span class="success">]
+└─</span><span class="warning"># </span></span>
     <input type="text" id="user-input" autofocus>
   </div>
 </div>
 
 <script>
 const terminal = document.getElementById('terminal');
-const userInput = document.getElementById('user-input');
-const prompt = 'root@kali:~# ';
+let userInput = document.getElementById('user-input');
+const prompt = `<span class="success">┌──(</span><span class="warning">root㉿kali</span><span class="success">)-[</span><span class="error">~</span><span class="success">]
+└─</span><span class="warning"># </span>`;
 
-// Generate 1000 random commands
-const commands = [
-  'nmap', 'metasploit', 'aircrack-ng', 'john', 'hashcat', 'wireshark', 'burpsuite', 'sqlmap',
-  'hydra', 'netcat', 'tcpdump', 'nikto', 'gobuster', 'dirb', 'wpscan', 'exploitdb', 'set',
-  'beef', 'maltego', 'recon-ng', 'theharvester', 'fierce', 'dnsenum', 'enum4linux', 'nbtscan',
-  'hping3', 'fping', 'arping', 'scapy', 'ettercap', 'bettercap', 'msfvenom', 'searchsploit',
-  'mimikatz', 'responder', 'crackmapexec', 'evil-winrm', 'impacket-scripts', 'powercat',
-  'bloodhound', 'empire', 'powersploit', 'koadic', 'merlin', 'pupy', 'gophish', 'social-engineer-toolkit',
-  'reaver', 'airgeddon', 'wifite', 'kismet', 'pixiewps', 'bully', 'cowpatty', 'asleap',
-  'mdk3', 'mdk4', 'wifiphisher', 'wifi-honey', 'evilginx2', 'shellter', 'veil', 'thefatrat',
-  'routersploit', 'commix', 'smbmap', 'crackmapexec', 'enum4linux', 'dsniff', 'responder',
-  'photon', 'subfinder', 'amass', 'sublist3r', 'altdns', 'massdns', 'knockpy', 'dnsmaper',
-  'ffuf', 'dirsearch', 'gobuster', 'feroxbuster', 'wfuzz', 'nuclei', 'aquatone', 'eyewitness',
-  'masscan', 'rustscan', 'zmap', 'autorecon', 'legion', 'lynis', 'linenum', 'linux-exploit-suggester',
-  'unix-privesc-check', 'pspy', 'mimipenguin', 'gdb', 'radare2', 'ghidra', 'binwalk', 'foremost',
-  'volatility', 'autopsy', 'bulk_extractor', 'scalpel', 'exiftool', 'steghide', 'stegcracker',
-  'zsteg', 'stegsolve', 'hashid', 'hash-identifier', 'rsmangler', 'cewl', 'crunch', 'cupp',
-  'hashcat-utils', 'hashview', 'patator', 'medusa', 'crowbar', 'fcrackzip', 'rarcrack', 'pdf2john',
-  'ssh2john', 'zip2john', 'keepass2john', 'office2john', 'racoon2', 'ike-scan', 'cisco-torch',
-  'cisco-global-exploiter', 'yersinia', 'scapy', 'voiphopper', 'sipvicious', 'iaxflood',
-  'inviteflood', 'rtpflood', 'rtpbreak', 'rtpinsertsound', 'rtpmixsound', 'sctpscan', 'sipp',
-  'sparta', 'p0f', 'xprobe2', 'fragroute', 'fragrouter', 'ncat', 'socat', 'powercat', 'cryptcat',
-  'webshells', 'weevely', 'laudanum', 'shellnoob', 'metasploit-framework', 'armitage', 'set',
-  'beef-xss', 'xsser', 'xsshunter', 'xsstrike', 'nosqlmap', 'sqlninja', 'jsql-injection',
-  'havij', 'bbqsql', 'xxeinjector', 'odat', 'cminer', 'ysoserial', 'sjet', 'commix', 'crawl',
-  'dirbuster', 'dirb', 'wfuzz', 'gobuster', 'feroxbuster', 'ffuf', 'nikto', 'uniscan', 'w3af',
-  'arachni', 'wpscan', 'joomscan', 'cmseek', 'droopescan', 'clusterd', 'skipfish', 'davtest',
-  'cadaver', 'rsync', 'enum4linux', 'nbtscan', 'onesixtyone', 'snmpcheck', 'snmp-check',
-  'snmpwalk', 'snmp-mibs-downloader', 'ike-scan', 'polenum', 'lbd', 'wafw00f', 'nmap',
-  'masscan', 'zmap', 'rustscan', 'unicornscan', 'amap', 'hping3', 'fping', 'arping', 'tcptraceroute',
-  'traceroute', 'netdiscover', 'arp-scan', 'dmitry', 'dnsenum', 'dnsmap', 'dnsrecon', 'dnstracer',
-  'dnswalk', 'fierce', 'maltego', 'recon-ng', 'theharvester', 'metagoofil', 'urlcrazy', 'whois',
-  'webhttrack', 'whatweb', 'wpscan', 'cmsmap', 'joomscan', 'droopescan', 'plecost', 'drupwn',
-  'cmseek', 'wapiti', 'xsser', 'xsscrapy', 'xsstrike', 'nosqlmap', 'sqlmap', 'havij', 'bbqsql',
-  'jsql-injection', 'sqlninja', 'xxeinjector', 'commix', 'odat', 'ysoserial', 'sjet', 'smbmap',
-  'enum4linux', 'rpcclient', 'crackmapexec', 'impacket-scripts', 'responder', 'mitm6', 'bettercap',
-  'ettercap', 'mitmproxy', 'sslstrip', 'sslsplit', 'dnschef', 'netsniff-ng', 'dsniff', 'wireshark',
-  'tshark', 'tcpdump', 'ngrep', 'snort', 'suricata', 'bro', 'kismet', 'airodump-ng', 'aircrack-ng',
-  'wifite', 'reaver', 'pixiewps', 'bully', 'cowpatty', 'asleap', 'mdk3', 'mdk4', 'wifiphisher',
-  'wifi-honey', 'airgeddon', 'fluxion', 'wifipumpkin3', 'evilginx2', 'gophish', 'king-phisher',
-  'social-engineer-toolkit', 'phishery', 'trape', 'wifiphisher', 'evilginx2', 'zphisher',
-  'hidden-eye', 'shellphish', 'blackeye', 'socialfish', 'weeman', 'phishx', 'maskphish',
-  'hiddeneye-legacy', 'nexphisher', 'pwnedornot', 'h8mail', 'holehe', 'sherlock', 'osintgram',
-  'twint', 'socialscan', 'whatbreach', 'breach-parse', 'phoneinfoga', 'ignorant', 'ghunt',
-  'osint-framework', 'recon-ng', 'spiderfoot', 'maltego', 'theharvester', 'photon', 'metagoofil',
-  'exiftool', 'theHarvester', 'skiptracer', 'userrecon', 'infoga', 'findsploit', 'searchsploit',
-  'nmap-vulners', 'vulscan', 'vulners', 'nuclei', 'nikto', 'wapiti', 'arachni', 'w3af', 'zap',
-  'openvas', 'nessus', 'nexpose', 'metasploit', 'routersploit', 'autosploit', 'exploitdb',
-  'beef-xss', 'xsshunter', 'xsser', 'xsscrapy', 'xsstrike', 'dalfox', 'nosqlmap', 'sqlmap',
-  'havij', 'bbqsql', 'jsql-injection', 'sqlninja', 'xxeinjector', 'commix', 'odat', 'ysoserial',
-  'sjet', 'cminer', 'linpeas', 'winpeas', 'linux-exploit-suggester', 'windows-exploit-suggester',
-  'linux-smart-enumeration', 'pspy', 'mimipenguin', 'mimipen', 'mimikatz', 'lazagne', 'pypykatz',
-  'procdump', 'volatility', 'volatility3', 'rekall', 'bulk_extractor', 'foremost', 'scalpel',
-  'binwalk', 'autopsy', 'dc3dd', 'ddrescue', 'testdisk', 'photorec', 'sleuthkit', 'ghidra',
-  'radare2', 'ida-free', 'gdb', 'edb-debugger', 'peda', 'pwndbg', 'gef', 'checksec', 'ropper',
-  'pwntools', 'angr', 'z3', 'capstone', 'keystone-engine', 'unicorn-engine', 'veil', 'shellter',
-  'the-backdoor-factory', 'shad0w', 'koadic', 'empire', 'starkiller', 'sliver', 'merlin',
-  'covenant', 'havoc', 'pupy', 'quasar', 'faction', 'metasploit-framework', 'armitage',
-  'cobalt-strike', 'payload-studio', 'venom', 'fatrat', 'evilreg', 'shellcode_compiler',
-  'donut', 'sRDI', 'darkarmour', 'phantom-evasion', 'avet', 'shinobis', 'inceptor', 'inception',
-  'morphhta', 'demiguise', 'sharpshooter', 'unicorn', 'macro_pack', 'macro-pack', 'malicious-macro-tester',
-  'maliciousmacrogenerator', 'wsh_mshta_obfuscation', 'luckystrike', 'demiguise', 'nps_payload',
-  'cactustorch', 'donut', 'shellcode_compiler', 'sharpshooter', 'unicorn', 'macro_pack',
-  'macro-pack', 'malicious-macro-tester', 'maliciousmacrogenerator', 'wsh_mshta_obfuscation',
-  'luckystrike', 'demiguise', 'nps_payload', 'cactustorch', 'donut', 'shellcode_compiler',
-  'sharpshooter', 'unicorn', 'macro_pack', 'macro-pack', 'malicious-macro-tester',
-  'maliciousmacrogenerator', 'wsh_mshta_obfuscation', 'luckystrike', 'demiguise', 'nps_payload',
-  'cactustorch', 'donut', 'shellcode_compiler', 'sharpshooter', 'unicorn', 'macro_pack',
-  'macro-pack', 'malicious-macro-tester', 'maliciousmacrogenerator', 'wsh_mshta_obfuscation',
-  'luckystrike', 'demiguise', 'nps_payload', 'cactustorch', 'donut', 'shellcode_compiler',
-  'sharpshooter', 'unicorn', 'macro_pack', 'macro-pack', 'malicious-macro-tester',
-  'maliciousmacrogenerator', 'wsh_mshta_obfuscation', 'luckystrike', 'demiguise', 'nps_payload',
-  'cactustorch', 'donut', 'shellcode_compiler', 'sharpshooter', 'unicorn', 'macro_pack',
-  'macro-pack', 'malicious-macro-tester', 'maliciousmacrogenerator', 'wsh_mshta_obfuscation',
-  'luckystrike', 'demiguise', 'nps_payload', 'cactustorch'
-];
+const commands = {
+  help: "Available commands: nmap, metasploit, aircrack-ng, john, hashcat, ls, cd, pwd, whoami, ifconfig, ping, cat, mkdir, rm, cp, mv, chmod, chown, sudo, apt, git, python, gcc, make, ssh, curl, wget, tar, neofetch, nano, vim, htop, i3wm, xfce, kde, clear, uname, date, df, du, top, ps, kill, find, grep, awk, sed, man, history, reboot, shutdown",
+  neofetch: `
+       ..............
+      :::::::::::::::::   root@kali
+     ::::::::::::::::::   OS: Kali GNU/Linux Rolling x86_64
+    :::::::::::::::::::'  Host: VirtualBox 1.2
+   :::::::::::::::::::'   Kernel: 5.15.0-kali3-amd64
+  :::::::::::::::::::     Uptime: 1 hour, 23 mins
+  ::::::::::::::::'       Packages: 2854 (dpkg)
+ .::::::::::::::'         Shell: bash 5.1.4
+.::::::::::::::           Resolution: 1920x1080
+:::::::::::::::           DE: Xfce 4.16
+':::::::::::::::          WM: Xfwm4
+ '::::::::::::::          Theme: Kali-Dark [GTK2/3]
+  ':::::::::::::          Icons: Flat-Remix-Blue-Dark [GTK2/3]
+   '::::::::::::          Terminal: xfce4-terminal
+    ':::::::::::          CPU: Intel i7-9750H (12) @ 4.500GHz
+     '::::::::::          GPU: NVIDIA GeForce GTX 1650
+      ':::::::::          Memory: 4096MiB / 16384MiB
+       ''''''''
+`,
+  nano: "GNU nano 5.4                  New Buffer                         \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n[ Read 0 lines ]",
+  vim: "VIM - Vi IMproved\n\n~                                                                    \n~                                                                    \n~                                                                    \n~                                                                    \n~                                                                    \n~                                                                    \n~                                                                    \n~                                                                    \n~                                                                    \n~                                                                    \n~                                                                    \n~                                                                    \n\"[No Name]\" [New File]",
+  htop: "  1  [||||||                                                  6.2%]\n  2  [|||                                                     2.0%]\n  3  [|||||                                                   4.5%]\n  4  [||||                                                    3.8%]\nMem[|||||||||||||||||||||||||||||                     11.2G/15.6G]\nSwp[|                                                    0K/1.00G]\n\n  PID USER      PRI  NI  VIRT   RES   SHR S CPU% MEM%   TIME+  Command\n    1 root       20   0  169M  11.2M   8.4M S  0.0  0.1  0:01.25 systemd\n  729 root       20   0  306M  45.2M  26.3M S  0.0  0.3  0:00.91 NetworkManager\n 1021 root       20   0  722M  44.7M  33.0M S  0.0  0.3  0:00.36 Xorg\n 1234 kali       20   0 3180M 258.3M 112.7M S  0.0  1.6  0:02.91 xfce4-session",
+  i3wm: "i3 window manager version 4.19.1 (2021-02-01)\n\nTo get started with i3, please read the user guide:\nhttps://i3wm.org/docs/userguide.html",
+  xfce: "Xfce Desktop Environment 4.16\n\nXfce is a lightweight desktop environment for UNIX-like operating systems.\nIt aims to be fast and low on system resources, while still being visually\nappealing and user friendly.",
+  kde: "KDE Plasma Desktop Environment 5.21\n\nKDE Plasma is a beautiful, feature-rich desktop environment that provides\nan intuitive and customizable user experience for both casual and power users.",
+  apt: function(args) {
+    if (args.length === 0) {
+      return "Usage: apt [options] command\n\nCommands:\n  list - list packages based on package names\n  search - search in package descriptions\n  show - show package details\n  install - install packages\n  remove - remove packages\n  update - update list of available packages\n  upgrade - upgrade the system by installing/upgrading packages";
+    }
+    switch(args[0]) {
+      case "update":
+        return "Hit:1 http://http.kali.org/kali kali-rolling InRelease\nReading package lists... Done\nBuilding dependency tree... Done\nReading state information... Done\nAll packages are up to date.";
+      case "upgrade":
+        return "Reading package lists... Done\nBuilding dependency tree... Done\nReading state information... Done\nCalculating upgrade... Done\n0 upgraded, 0 newly installed, 0 to remove and 0 not upgraded.";
+      case "install":
+        if (args.length < 2) return "E: No package name specified";
+        return `Reading package lists... Done\nBuilding dependency tree... Done\nReading state information... Done\nThe following NEW packages will be installed:\n  ${args[1]}\n0 upgraded, 1 newly installed, 0 to remove and 0 not upgraded.\nNeed to get 1,234 kB of archives.\nAfter this operation, 5,678 kB of additional disk space will be used.\nGet:1 http://http.kali.org/kali kali-rolling/main amd64 ${args[1]} amd64 1.2.3-4 [1,234 kB]\nFetched 1,234 kB in 2s (617 kB/s)\nSelecting previously unselected package ${args[1]}.\nPreparing to unpack .../${args[1]}_1.2.3-4_amd64.deb ...\nUnpacking ${args[1]} (1.2.3-4) ...\nSetting up ${args[1]} (1.2.3-4) ...\nProcessing triggers for man-db (2.9.4-2) ...`;
+      default:
+        return `E: Invalid operation ${args[0]}`;
+    }
+  },
+  sudo: "root@kali:~# Sudo is not needed, you are already root!",
+  whoami: "root",
+  ls: "Desktop  Documents  Downloads  Music  Pictures  Public  Templates  Videos",
+  pwd: "/root",
+  cd: "Changed directory.",
+  mkdir: "Directory created.",
+  rm: "File or directory removed.",
+  cp: "File or directory copied.",
+  mv: "File or directory moved.",
+  chmod: "Permissions changed.",
+  chown: "Ownership changed.",
+  cat: "File contents displayed.",
+  uname: "Linux kali 5.15.0-kali3-amd64 #1 SMP Debian 5.15.15-2kali1 (2022-01-31) x86_64 GNU/Linux",
+  date: new Date().toString(),
+  df: "Filesystem     1K-blocks      Used Available Use% Mounted on\n/dev/sda1      41152812  20123456  19029356  52% /\ntmpfs            8151816         0   8151816   0% /dev/shm\n/dev/sdb1     976762584 488381292 488381292  50% /media/data",
+  du: "4.0K    ./Desktop\n4.0K    ./Documents\n4.0K    ./Downloads\n4.0K    ./Music\n4.0K    ./Pictures\n4.0K    ./Public\n4.0K    ./Templates\n4.0K    ./Videos\n36K     .",
+  top: "top - 14:30:45 up  1:23,  1 user,  load average: 0.00, 0.01, 0.05\nTasks: 213 total,   1 running, 212 sleeping,   0 stopped,   0 zombie\n%Cpu(s):  0.0 us,  0.0 sy,  0.0 ni,100.0 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st\nMiB Mem :  15925.8 total,  10123.4 free,   2345.6 used,   3456.8 buff/cache\nMiB Swap:   2048.0 total,   2048.0 free,      0.0 used.  12789.2 avail Mem \n\n  PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND\n    1 root      20   0  169468  13292   8940 S   0.0   0.1   0:01.25 systemd\n  729 root      20   0  306724  46340  27012 S   0.0   0.3   0:00.91 NetworkManager\n 1021 root      20   0  722084  45748  33824 S   0.0   0.3   0:00.36 Xorg\n 1234 kali      20   0 3180232 264508 115384 S   0.0   1.6   0:02.91 xfce4-session",
+  ps: "  PID TTY          TIME CMD\n 1234 tty1     00:00:00 bash\n 1235 tty1     00:00:00 ps",
+  kill: "Process terminated.",
+  find: "find: missing argument to `-exec'",
+  grep: "Usage: grep [OPTION]... PATTERN [FILE]...\nTry 'grep --help' for more information.",
+  awk: "Usage: awk [POSIX or GNU style options] -f progfile [--] file ...\nUsage: awk [POSIX or GNU style options] [--] 'program' file ...",
+  sed: "Usage: sed [OPTION]... {script-only-if-no-other-script} [input-file]...",
+  man: "What manual page do you want?\nFor example, try 'man man'.",
+  history: " 1  ls\n 2  pwd\n 3  whoami\n 4  neofetch\n 5  apt update\n 6  history",
+  reboot: "System is going down for reboot NOW!",
+  shutdown: "System is going down for poweroff NOW!"
+};
 
-// Fill up to 1000 commands
-while (commands.length < 1000) {
-  commands.push('custom_command_' + Math.floor(Math.random() * 1000));
-}
-
-function addOutput(text) {
-  const output = document.createElement('div');
-  output.className = 'output';
-  output.textContent = text;
-  terminal.insertBefore(output, document.getElementById('input-line'));
-  terminal.scrollTop = terminal.scrollHeight;
-}
-
-function processCommand(command) {
-  if (command.trim() === '') {
-    return;
-  }
-
-  addOutput(prompt + command);
-
-  if (command === 'clear') {
-    terminal.innerHTML = '';
-    terminal.appendChild(document.getElementById('input-line'));
-  } else if (command === 'help') {
-    addOutput('Available commands:\n' + commands.join('\n'));
-  } else if (commands.includes(command)) {
-    addOutput('Executing ' + command + '...\nCommand completed.');
-  } else {
-    addOutput('Command not found: ' + command);
-  }
-}
-
-userInput.addEventListener('keydown', function(event) {
+function handleCommand(event) {
   if (event.key === 'Enter') {
-    const command = userInput.value;
+    event.preventDefault();
+    const fullCommand = userInput.value.trim();
+    const [command, ...args] = fullCommand.split(' ');
     userInput.value = '';
-    processCommand(command);
+
+    const output = document.createElement('div');
+    output.classList.add('output');
+    output.innerHTML = `${prompt}${fullCommand}\n`;
+
+    if (command in commands) {
+      if (typeof commands[command] === 'function') {
+        output.innerHTML += commands[command](args);
+      } else {
+        output.innerHTML += commands[command];
+      }
+    } else if (command === 'clear') {
+      terminal.innerHTML = '';
+      terminal.appendChild(document.createElement('div')).id = 'input-line';
+      document.getElementById('input-line').innerHTML = `<span id="prompt">${prompt}</span><input type="text" id="user-input" autofocus>`;
+      userInput = document.getElementById('user-input');
+      userInput.addEventListener('keydown', handleCommand);
+      userInput.focus();
+      return;
+    } else {
+      output.innerHTML += `Command not found: ${command}`;
+    }
+
+    terminal.insertBefore(output, document.getElementById('input-line'));
+    terminal.scrollTop = terminal.scrollHeight;
   }
-});
+}
 
-// Initial focus
+userInput.addEventListener('keydown', handleCommand);
+
+// Move the cursor to the end of the input
 userInput.focus();
-
-// Keep focus on input
-document.addEventListener('click', function() {
-  userInput.focus();
-});
+userInput.setSelectionRange(userInput.value.length, userInput.value.length);
 </script>
 </body>
 </html>
