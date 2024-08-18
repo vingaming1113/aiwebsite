@@ -1,0 +1,200 @@
+<html><head><base href="https://kali.linux.terminal/tty1/">
+<title>Kali Linux Terminal TTY1</title>
+<style>
+  body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background-color: #000;
+    color: #00ff00;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    overflow: hidden;
+  }
+  #terminal {
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    padding: 10px;
+    box-sizing: border-box;
+  }
+  #input-line {
+    display: flex;
+    align-items: center;
+  }
+  #prompt {
+    color: #00ff00;
+    margin-right: 5px;
+  }
+  #user-input {
+    background: transparent;
+    border: none;
+    color: #00ff00;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    outline: none;
+    width: 100%;
+  }
+  .output {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+</style>
+</head>
+<body>
+<div id="terminal">
+  <div class="output">Welcome to Kali Linux!
+
+Kali Linux 2023.2 tty1
+
+kali login: root
+Password: 
+
+Last login: Thu Jun 15 10:30:15 UTC 2023 on tty1
+Linux kali 5.15.0-kali3-amd64 #1 SMP Debian 5.15.15-2kali1 (2022-01-31) x86_64
+
+The programs included with the Kali GNU/Linux system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Kali GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+permitted by applicable law.
+</div>
+  <div id="input-line">
+    <span id="prompt">root@kali:~#</span>
+    <input type="text" id="user-input" autofocus>
+  </div>
+</div>
+
+<script>
+const terminal = document.getElementById('terminal');
+const userInput = document.getElementById('user-input');
+const prompt = 'root@kali:~# ';
+
+// Generate 1000 random commands
+const commands = [
+  'nmap', 'metasploit', 'aircrack-ng', 'john', 'hashcat', 'wireshark', 'burpsuite', 'sqlmap',
+  'hydra', 'netcat', 'tcpdump', 'nikto', 'gobuster', 'dirb', 'wpscan', 'exploitdb', 'set',
+  'beef', 'maltego', 'recon-ng', 'theharvester', 'fierce', 'dnsenum', 'enum4linux', 'nbtscan',
+  'hping3', 'fping', 'arping', 'scapy', 'ettercap', 'bettercap', 'msfvenom', 'searchsploit',
+  'mimikatz', 'responder', 'crackmapexec', 'evil-winrm', 'impacket-scripts', 'powercat',
+  'bloodhound', 'empire', 'powersploit', 'koadic', 'merlin', 'pupy', 'gophish', 'social-engineer-toolkit',
+  'reaver', 'airgeddon', 'wifite', 'kismet', 'pixiewps', 'bully', 'cowpatty', 'asleap',
+  'mdk3', 'mdk4', 'wifiphisher', 'wifi-honey', 'evilginx2', 'shellter', 'veil', 'thefatrat',
+  'routersploit', 'commix', 'smbmap', 'crackmapexec', 'enum4linux', 'dsniff', 'responder',
+  'photon', 'subfinder', 'amass', 'sublist3r', 'altdns', 'massdns', 'knockpy', 'dnsmaper',
+  'ffuf', 'dirsearch', 'gobuster', 'feroxbuster', 'wfuzz', 'nuclei', 'aquatone', 'eyewitness',
+  'masscan', 'rustscan', 'zmap', 'autorecon', 'legion', 'lynis', 'linenum', 'linux-exploit-suggester',
+  'unix-privesc-check', 'pspy', 'mimipenguin', 'gdb', 'radare2', 'ghidra', 'binwalk', 'foremost',
+  'volatility', 'autopsy', 'bulk_extractor', 'scalpel', 'exiftool', 'steghide', 'stegcracker',
+  'zsteg', 'stegsolve', 'hashid', 'hash-identifier', 'rsmangler', 'cewl', 'crunch', 'cupp',
+  'hashcat-utils', 'hashview', 'patator', 'medusa', 'crowbar', 'fcrackzip', 'rarcrack', 'pdf2john',
+  'ssh2john', 'zip2john', 'keepass2john', 'office2john', 'racoon2', 'ike-scan', 'cisco-torch',
+  'cisco-global-exploiter', 'yersinia', 'scapy', 'voiphopper', 'sipvicious', 'iaxflood',
+  'inviteflood', 'rtpflood', 'rtpbreak', 'rtpinsertsound', 'rtpmixsound', 'sctpscan', 'sipp',
+  'sparta', 'p0f', 'xprobe2', 'fragroute', 'fragrouter', 'ncat', 'socat', 'powercat', 'cryptcat',
+  'webshells', 'weevely', 'laudanum', 'shellnoob', 'metasploit-framework', 'armitage', 'set',
+  'beef-xss', 'xsser', 'xsshunter', 'xsstrike', 'nosqlmap', 'sqlninja', 'jsql-injection',
+  'havij', 'bbqsql', 'xxeinjector', 'odat', 'cminer', 'ysoserial', 'sjet', 'commix', 'crawl',
+  'dirbuster', 'dirb', 'wfuzz', 'gobuster', 'feroxbuster', 'ffuf', 'nikto', 'uniscan', 'w3af',
+  'arachni', 'wpscan', 'joomscan', 'cmseek', 'droopescan', 'clusterd', 'skipfish', 'davtest',
+  'cadaver', 'rsync', 'enum4linux', 'nbtscan', 'onesixtyone', 'snmpcheck', 'snmp-check',
+  'snmpwalk', 'snmp-mibs-downloader', 'ike-scan', 'polenum', 'lbd', 'wafw00f', 'nmap',
+  'masscan', 'zmap', 'rustscan', 'unicornscan', 'amap', 'hping3', 'fping', 'arping', 'tcptraceroute',
+  'traceroute', 'netdiscover', 'arp-scan', 'dmitry', 'dnsenum', 'dnsmap', 'dnsrecon', 'dnstracer',
+  'dnswalk', 'fierce', 'maltego', 'recon-ng', 'theharvester', 'metagoofil', 'urlcrazy', 'whois',
+  'webhttrack', 'whatweb', 'wpscan', 'cmsmap', 'joomscan', 'droopescan', 'plecost', 'drupwn',
+  'cmseek', 'wapiti', 'xsser', 'xsscrapy', 'xsstrike', 'nosqlmap', 'sqlmap', 'havij', 'bbqsql',
+  'jsql-injection', 'sqlninja', 'xxeinjector', 'commix', 'odat', 'ysoserial', 'sjet', 'smbmap',
+  'enum4linux', 'rpcclient', 'crackmapexec', 'impacket-scripts', 'responder', 'mitm6', 'bettercap',
+  'ettercap', 'mitmproxy', 'sslstrip', 'sslsplit', 'dnschef', 'netsniff-ng', 'dsniff', 'wireshark',
+  'tshark', 'tcpdump', 'ngrep', 'snort', 'suricata', 'bro', 'kismet', 'airodump-ng', 'aircrack-ng',
+  'wifite', 'reaver', 'pixiewps', 'bully', 'cowpatty', 'asleap', 'mdk3', 'mdk4', 'wifiphisher',
+  'wifi-honey', 'airgeddon', 'fluxion', 'wifipumpkin3', 'evilginx2', 'gophish', 'king-phisher',
+  'social-engineer-toolkit', 'phishery', 'trape', 'wifiphisher', 'evilginx2', 'zphisher',
+  'hidden-eye', 'shellphish', 'blackeye', 'socialfish', 'weeman', 'phishx', 'maskphish',
+  'hiddeneye-legacy', 'nexphisher', 'pwnedornot', 'h8mail', 'holehe', 'sherlock', 'osintgram',
+  'twint', 'socialscan', 'whatbreach', 'breach-parse', 'phoneinfoga', 'ignorant', 'ghunt',
+  'osint-framework', 'recon-ng', 'spiderfoot', 'maltego', 'theharvester', 'photon', 'metagoofil',
+  'exiftool', 'theHarvester', 'skiptracer', 'userrecon', 'infoga', 'findsploit', 'searchsploit',
+  'nmap-vulners', 'vulscan', 'vulners', 'nuclei', 'nikto', 'wapiti', 'arachni', 'w3af', 'zap',
+  'openvas', 'nessus', 'nexpose', 'metasploit', 'routersploit', 'autosploit', 'exploitdb',
+  'beef-xss', 'xsshunter', 'xsser', 'xsscrapy', 'xsstrike', 'dalfox', 'nosqlmap', 'sqlmap',
+  'havij', 'bbqsql', 'jsql-injection', 'sqlninja', 'xxeinjector', 'commix', 'odat', 'ysoserial',
+  'sjet', 'cminer', 'linpeas', 'winpeas', 'linux-exploit-suggester', 'windows-exploit-suggester',
+  'linux-smart-enumeration', 'pspy', 'mimipenguin', 'mimipen', 'mimikatz', 'lazagne', 'pypykatz',
+  'procdump', 'volatility', 'volatility3', 'rekall', 'bulk_extractor', 'foremost', 'scalpel',
+  'binwalk', 'autopsy', 'dc3dd', 'ddrescue', 'testdisk', 'photorec', 'sleuthkit', 'ghidra',
+  'radare2', 'ida-free', 'gdb', 'edb-debugger', 'peda', 'pwndbg', 'gef', 'checksec', 'ropper',
+  'pwntools', 'angr', 'z3', 'capstone', 'keystone-engine', 'unicorn-engine', 'veil', 'shellter',
+  'the-backdoor-factory', 'shad0w', 'koadic', 'empire', 'starkiller', 'sliver', 'merlin',
+  'covenant', 'havoc', 'pupy', 'quasar', 'faction', 'metasploit-framework', 'armitage',
+  'cobalt-strike', 'payload-studio', 'venom', 'fatrat', 'evilreg', 'shellcode_compiler',
+  'donut', 'sRDI', 'darkarmour', 'phantom-evasion', 'avet', 'shinobis', 'inceptor', 'inception',
+  'morphhta', 'demiguise', 'sharpshooter', 'unicorn', 'macro_pack', 'macro-pack', 'malicious-macro-tester',
+  'maliciousmacrogenerator', 'wsh_mshta_obfuscation', 'luckystrike', 'demiguise', 'nps_payload',
+  'cactustorch', 'donut', 'shellcode_compiler', 'sharpshooter', 'unicorn', 'macro_pack',
+  'macro-pack', 'malicious-macro-tester', 'maliciousmacrogenerator', 'wsh_mshta_obfuscation',
+  'luckystrike', 'demiguise', 'nps_payload', 'cactustorch', 'donut', 'shellcode_compiler',
+  'sharpshooter', 'unicorn', 'macro_pack', 'macro-pack', 'malicious-macro-tester',
+  'maliciousmacrogenerator', 'wsh_mshta_obfuscation', 'luckystrike', 'demiguise', 'nps_payload',
+  'cactustorch', 'donut', 'shellcode_compiler', 'sharpshooter', 'unicorn', 'macro_pack',
+  'macro-pack', 'malicious-macro-tester', 'maliciousmacrogenerator', 'wsh_mshta_obfuscation',
+  'luckystrike', 'demiguise', 'nps_payload', 'cactustorch', 'donut', 'shellcode_compiler',
+  'sharpshooter', 'unicorn', 'macro_pack', 'macro-pack', 'malicious-macro-tester',
+  'maliciousmacrogenerator', 'wsh_mshta_obfuscation', 'luckystrike', 'demiguise', 'nps_payload',
+  'cactustorch', 'donut', 'shellcode_compiler', 'sharpshooter', 'unicorn', 'macro_pack',
+  'macro-pack', 'malicious-macro-tester', 'maliciousmacrogenerator', 'wsh_mshta_obfuscation',
+  'luckystrike', 'demiguise', 'nps_payload', 'cactustorch'
+];
+
+// Fill up to 1000 commands
+while (commands.length < 1000) {
+  commands.push('custom_command_' + Math.floor(Math.random() * 1000));
+}
+
+function addOutput(text) {
+  const output = document.createElement('div');
+  output.className = 'output';
+  output.textContent = text;
+  terminal.insertBefore(output, document.getElementById('input-line'));
+  terminal.scrollTop = terminal.scrollHeight;
+}
+
+function processCommand(command) {
+  if (command.trim() === '') {
+    return;
+  }
+
+  addOutput(prompt + command);
+
+  if (command === 'clear') {
+    terminal.innerHTML = '';
+    terminal.appendChild(document.getElementById('input-line'));
+  } else if (command === 'help') {
+    addOutput('Available commands:\n' + commands.join('\n'));
+  } else if (commands.includes(command)) {
+    addOutput('Executing ' + command + '...\nCommand completed.');
+  } else {
+    addOutput('Command not found: ' + command);
+  }
+}
+
+userInput.addEventListener('keydown', function(event) {
+  if (event.key === 'Enter') {
+    const command = userInput.value;
+    userInput.value = '';
+    processCommand(command);
+  }
+});
+
+// Initial focus
+userInput.focus();
+
+// Keep focus on input
+document.addEventListener('click', function() {
+  userInput.focus();
+});
+</script>
+</body>
+</html>
