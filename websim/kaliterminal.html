@@ -129,7 +129,7 @@ const prompt = `<span class="success">┌──(</span><span class="warning">roo
 └─</span><span class="warning"># </span>`;
 
 const commands = {
-  help: "Available commands: nmap, metasploit, aircrack-ng, john, hashcat, ls, cd, pwd, whoami, ifconfig, ping, cat, mkdir, rm, cp, mv, chmod, chown, sudo, apt, git, python, gcc, make, ssh, curl, wget, tar, neofetch, nano, vim, htop, i3wm, xfce, kde, clear, uname, date, df, du, top, ps, kill, find, grep, awk, sed, man, history, reboot, shutdown",
+  help: "Available commands: nmap, metasploit, aircrack-ng, john, hashcat, ls, cd, pwd, whoami, ifconfig, ping, cat, mkdir, rm, cp, mv, chmod, chown, sudo, apt, git, python, gcc, make, ssh, curl, wget, tar, neofetch, nano, vim, htop, i3wm, xfce, kde, gnome, mate, cinnamon, lxde, openbox, awesome, bspwm, dwm, xmonad, fluxbox, clear, uname, date, df, du, top, ps, kill, find, grep, awk, sed, man, history, reboot, shutdown, startx",
   neofetch: `
        ..............
       :::::::::::::::::   root@kali
@@ -156,6 +156,16 @@ const commands = {
   i3wm: "i3 window manager version 4.19.1 (2021-02-01)\n\nTo get started with i3, please read the user guide:\nhttps://i3wm.org/docs/userguide.html",
   xfce: "Xfce Desktop Environment 4.16\n\nXfce is a lightweight desktop environment for UNIX-like operating systems.\nIt aims to be fast and low on system resources, while still being visually\nappealing and user friendly.",
   kde: "KDE Plasma Desktop Environment 5.21\n\nKDE Plasma is a beautiful, feature-rich desktop environment that provides\nan intuitive and customizable user experience for both casual and power users.",
+  gnome: "GNOME Desktop Environment 40\n\nGNOME is a free and open-source desktop environment for Unix-like operating systems.\nIt is designed to put you in control and get things done.",
+  mate: "MATE Desktop Environment 1.24\n\nMATE is a fork of GNOME 2. It provides an intuitive and attractive desktop environment\nusing traditional metaphors for Linux and other Unix-like operating systems.",
+  cinnamon: "Cinnamon Desktop Environment 4.8\n\nCinnamon is a free and open-source desktop environment for the X Window System\nthat derives from GNOME 3 but follows traditional desktop metaphor conventions.",
+  lxde: "LXDE (Lightweight X11 Desktop Environment)\n\nLXDE is a free desktop environment with comparatively low resource requirements.\nThis makes it especially suitable for resource-constrained older hardware.",
+  openbox: "Openbox 3.6.1\n\nOpenbox is a highly configurable, next generation window manager\nwith extensive standards support.",
+  awesome: "awesome window manager 4.3\n\nawesome is a highly configurable, next generation framework window manager for X.\nIt is very fast, extensible and licensed under the GNU GPLv2 license.",
+  bspwm: "bspwm 0.9.10\n\nbspwm is a tiling window manager that represents windows as the leaves\nof a full binary tree.",
+  dwm: "dwm 6.2\n\ndwm is a dynamic window manager for X. It manages windows in tiled, monocle\nand floating layouts.",
+  xmonad: "xmonad 0.15\n\nxmonad is a dynamically tiling X11 window manager that is written and\nconfigured in Haskell.",
+  fluxbox: "Fluxbox 1.3.7\n\nFluxbox is a windowmanager for X that was based on the Blackbox 0.61.1 code.\nIt is very light on resources and easy to handle but yet full of features to make\nan easy, and extremely fast, desktop experience.",
   apt: function(args) {
     if (args.length === 0) {
       return "Usage: apt [options] command\n\nCommands:\n  list - list packages based on package names\n  search - search in package descriptions\n  show - show package details\n  install - install packages\n  remove - remove packages\n  update - update list of available packages\n  upgrade - upgrade the system by installing/upgrading packages";
@@ -190,7 +200,7 @@ const commands = {
   chown: "Ownership changed.",
   cat: "File contents displayed.",
   uname: "Linux kali 5.15.0-kali3-amd64 #1 SMP Debian 5.15.15-2kali1 (2022-01-31) x86_64 GNU/Linux",
-  date: new Date().toString(),
+  date: function() { return new Date().toString(); },
   df: "Filesystem     1K-blocks      Used Available Use% Mounted on\n/dev/sda1      41152812  20123456  19029356  52% /\ntmpfs            8151816         0   8151816   0% /dev/shm\n/dev/sdb1     976762584 488381292 488381292  50% /media/data",
   du: "4.0K    ./Desktop\n4.0K    ./Documents\n4.0K    ./Downloads\n4.0K    ./Music\n4.0K    ./Pictures\n4.0K    ./Public\n4.0K    ./Templates\n4.0K    ./Videos\n36K     .",
   top: "top - 14:30:45 up  1:23,  1 user,  load average: 0.00, 0.01, 0.05\nTasks: 213 total,   1 running, 212 sleeping,   0 stopped,   0 zombie\n%Cpu(s):  0.0 us,  0.0 sy,  0.0 ni,100.0 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st\nMiB Mem :  15925.8 total,  10123.4 free,   2345.6 used,   3456.8 buff/cache\nMiB Swap:   2048.0 total,   2048.0 free,      0.0 used.  12789.2 avail Mem \n\n  PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND\n    1 root      20   0  169468  13292   8940 S   0.0   0.1   0:01.25 systemd\n  729 root      20   0  306724  46340  27012 S   0.0   0.3   0:00.91 NetworkManager\n 1021 root      20   0  722084  45748  33824 S   0.0   0.3   0:00.36 Xorg\n 1234 kali      20   0 3180232 264508 115384 S   0.0   1.6   0:02.91 xfce4-session",
@@ -203,7 +213,23 @@ const commands = {
   man: "What manual page do you want?\nFor example, try 'man man'.",
   history: " 1  ls\n 2  pwd\n 3  whoami\n 4  neofetch\n 5  apt update\n 6  history",
   reboot: "System is going down for reboot NOW!",
-  shutdown: "System is going down for poweroff NOW!"
+  shutdown: "System is going down for poweroff NOW!",
+  startx: "Starting X server...\n\nX.Org X Server 1.20.11\nX Protocol Version 11, Revision 0\n...\n\nxinit: giving up\nxinit: unable to connect to X server: Connection refused\nxinit: server error",
+  nmap: "Nmap 7.91 ( https://nmap.org )\nUsage: nmap [Scan Type(s)] [Options] {target specification}\nTARGET SPECIFICATION:\n  Can pass hostnames, IP addresses, networks, etc.\n  Ex: scanme.nmap.org, microsoft.com/24, 192.168.0.1; 10.0.0-255.1-254\nSCAN TECHNIQUES:\n  -sS/sT/sA/sW/sM: TCP SYN/Connect()/ACK/Window/Maimon scans\n  -sU: UDP Scan\n  -sN/sF/sX: TCP Null, FIN, and Xmas scans\n  --scanflags <flags>: Customize TCP scan flags\n  -sI <zombie host[:probeport]>: Idle scan\n  -sY/sZ: SCTP INIT/COOKIE-ECHO scans\n  -sO: IP protocol scan\n  -b <FTP relay host>: FTP bounce scan",
+  metasploit: "Metasploit Framework 6.0.45-dev\n\n       =[ metasploit v6.0.45-dev                          ]\n+ -- --=[ 2137 exploits - 1139 auxiliary - 360 post       ]\n+ -- --=[ 592 payloads - 45 encoders - 10 nops            ]\n+ -- --=[ 8 evasion                                       ]\n\nMsf > ",
+  "aircrack-ng": "Aircrack-ng 1.6  - (C) 2006-2020 Thomas d'Otreppe\nhttps://www.aircrack-ng.org\n\nUsage: aircrack-ng [options] <input file(s)>\n\nOptions:\n\n  -a <amode> : force attack mode (1/WEP, 2/WPA-PSK)\n  -e <essid> : target ESSID\n  -b <bssid> : target BSSID\n  -p <nbcpu> : # of CPU to use  (default: all CPUs)\n  -q         : enable quiet mode\n  -C <macs>  : merge the given APs to a virtual one\n  -l <file>  : write key to file\n  -c         : show ASCII version of the key\n  -t         : disable bruteforce for WEP cracking\n  -h         : show help",
+  john: "John the Ripper 1.9.0-jumbo-1 OMP [linux-gnu 64-bit x86_64 AVX2 AC]",
+  hashcat: "hashcat (v6.1.1) starting...\n\n* Device #1: Not applicable.\n\nOpenCL API (OpenCL 2.0 LINUX) - Platform #1 [Intel(R) Corporation]\n============================================================\n* Device #2: Intel(R) Core(TM) i7-9750H CPU @ 2.60GHz, 7872/15809 MB (2048 MB allocatable), 6MCU",
+  ifconfig: "eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500\n        inet 192.168.1.100  netmask 255.255.255.0  broadcast 192.168.1.255\n        inet6 fe80::a00:27ff:fe8d:c04d  prefixlen 64  scopeid 0x20<link>\n        ether 08:00:27:8d:c0:4d  txqueuelen 1000  (Ethernet)\n        RX packets 81  bytes 8908 (8.7 KiB)\n        RX errors 0  dropped 0  overruns 0  frame 0\n        TX packets 78  bytes 12145 (11.8 KiB)\n        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0",
+  ping: "PING google.com (172.217.16.142) 56(84) bytes of data.\n64 bytes from lhr25s10-in-f14.1e100.net (172.217.16.142): icmp_seq=1 ttl=117 time=10.4 ms\n64 bytes from lhr25s10-in-f14.1e100.net (172.217.16.142): icmp_seq=2 ttl=117 time=10.5 ms\n64 bytes from lhr25s10-in-f14.1e100.net (172.217.16.142): icmp_seq=3 ttl=117 time=10.4 ms\n\n--- google.com ping statistics ---\n3 packets transmitted, 3 received, 0% packet loss, time 2003ms\nrtt min/avg/max/mdev = 10.351/10.429/10.544/0.081 ms",
+  git: "usage: git [--version] [--help] [-C <path>] [-c <name>=<value>]\n           [--exec-path[=<path>]] [--html-path] [--man-path] [--info-path]\n           [-p | --paginate | -P | --no-pager] [--no-replace-objects] [--bare]\n           [--git-dir=<path>] [--work-tree=<path>] [--namespace=<name>]\n           [--super-prefix=<path>] [--config-env=<name>=<envvar>]\n           <command> [<args>]",
+  python: "Python 3.9.2 (default, Feb 28 2021, 17:03:44) \n[GCC 10.2.1 20210110] on linux\nType \"help\", \"copyright\", \"credits\" or \"license\" for more information.",
+  gcc: "gcc (Debian 10.2.1-6) 10.2.1 20210110\nCopyright (C) 2020 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.",
+  make: "GNU Make 4.3\nBuilt for x86_64-pc-linux-gnu\nCopyright (C) 1988-2020 Free Software Foundation, Inc.\nLicense GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>\nThis is free software: you are free to change and redistribute it.\nThere is NO WARRANTY, to the extent permitted by law.",
+  ssh: "usage: ssh [-46AaCfGgKkMNnqsTtVvXxYy] [-B bind_interface]\n           [-b bind_address] [-c cipher_spec] [-D [bind_address:]port]\n           [-E log_file] [-e escape_char] [-F configfile] [-I pkcs11]\n           [-i identity_file] [-J [user@]host[:port]] [-L address]\n           [-l login_name] [-m mac_spec] [-O ctl_cmd] [-o option] [-p port]\n           [-Q query_option] [-R address] [-S ctl_path] [-W host:port]\n           [-w local_tun[:remote_tun]] destination [command]",
+  curl: "curl 7.74.0 (x86_64-pc-linux-gnu) libcurl/7.74.0 OpenSSL/1.1.1k zlib/1.2.11 brotli/1.0.9 libidn2/2.3.0 libpsl/0.21.0 (+libidn2/2.3.0) libssh2/1.9.0 nghttp2/1.43.0 librtmp/2.3",
+  wget: "GNU Wget 1.21 built on linux-gnu.\n\n-caret- bugs and suggestions to <bug-wget@gnu.org>\n\nUsage: wget [OPTION]... [URL]...\n\nMandatory arguments to long options are mandatory for short options too.\n\nStartup:\n  -V,  --version                   display the version of Wget and exit\n  -h,  --help                      print this help\n  -b,  --background                go to background after startup\n  -e,  --execute=COMMAND           execute a `.wgetrc'-style command",
+  tar: "Usage: tar [OPTION...] [FILE]...\nGNU 'tar' saves many files together into a single tape or disk archive, and can\nrestore individual files from the archive.\n\nExamples:\n  tar -cf archive.tar foo bar  # Create archive.tar from files foo and bar.\n  tar -tvf archive.tar         # List all files in archive.tar verbosely.\n  tar -xf archive.tar          # Extract all files from archive.tar.",
 };
 
 let commandCount = 0;
