@@ -127,7 +127,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: #0000AA;
+    background-color: #000000;
     color: #FFFFFF;
     font-family: monospace;
     font-size: 24px;
@@ -163,7 +163,7 @@
 </div>
 
 <div id="kernel-panic">
-  KERNEL_PANIC_TRIGGER_MANUAL
+  KERNEL PANIC: SELF_TRIGGER
 </div>
 
 <script>
@@ -190,6 +190,9 @@ let currentUser = 'user';
 let loginMethod = 'default'; // 'default', 'su', or 'login'
 let isLoggedIn = true; // New variable to track login state
 let isKernelPanic = false; // New variable to track kernel panic state
+let networkDelay = 0; // New variable to track network delay
+let isNetworkConnected = true; // New variable to track network connection status
+
 let users = {
   'root': {
     password: '',
@@ -221,6 +224,19 @@ let users = {
         'apt-pkgs': {}
       }
     }
+  },
+  'toor': {
+    password: '',
+    fileSystem: {
+      '/': {
+        'home': {
+          'toor': {}
+        },
+        'etc': {},
+        'var': {},
+        'apt-pkgs': {}
+      }
+    }
   }
 };
 
@@ -243,15 +259,15 @@ const availablePackages = {
     content: '#############################################$@%$#%^$%^$!%^@$!%^@$!%$@%!$@^&$@!$&@^$%!&@%^!@'.repeat(100),
     size: 100 * 1024 * 1024 // 100 MB
   },
-  'kernel-panic': {
-    filename: 'kernel-panic',
-    content: 'KERNEL_PANIC_TRIGGER_MANUAL',
-    size: 62.28 * 1024 // 62.28 KB
-  },
   'userman': {
     filename: 'userman',
     content: 'User Management System',
     size: 257.28 * 1024 * 1024 // 257.28 MB
+  },
+  'net-utils': {
+    filename: 'net-utils',
+    content: 'Network Utilities Package',
+    size: 108.49 * 1024 * 1024 // 108.49 MB
   }
 };
 
@@ -310,7 +326,7 @@ const commands = {
     let aptCommands = Object.keys(users[currentUser].fileSystem['/']['apt-pkgs'] || {})
       .filter(cmd => cmd !== 'userman' && cmd === availablePackages[cmd]?.filename)
       .join(', ');
-    let output = 'Available commands: help, echo, clear, exit, ls, cd, mkdir, touch, cat, rm, nano, filetypes, documentation, su, neofetch, strg, apt, net-sim, net-show, sudo, login, logoff';
+    let output = 'Available commands: help, echo, clear, exit, ls, cd, mkdir, touch, cat, rm, nano, filetypes, documentation, su, neofetch, strg, apt, net-sim, net-show, sudo, login, logoff, reset';
     if (customCommands) {
       output += ' | Custom commands: ' + customCommands;
     }
@@ -319,6 +335,9 @@ const commands = {
     }
     if (users[currentUser].fileSystem['/']['apt-pkgs'] && users[currentUser].fileSystem['/']['apt-pkgs'].hasOwnProperty('userman')) {
       output += ' | Userman commands: create-user, delete-user, passwd';
+    }
+    if (users[currentUser].fileSystem['/']['apt-pkgs'] && users[currentUser].fileSystem['/']['apt-pkgs'].hasOwnProperty('net-utils')) {
+      output += ' | Net-utils commands: net-sim-ping, net-down, net-up, net-utils';
     }
     return output;
   },
@@ -504,6 +523,7 @@ RAM: ${usedRam}MB used out of 16839MB RAM
 OS: Debian 12.6.0 Custom Edition
 Kernel Version: Linux 5.1
 Storage: ${storageInfo}
+Network: ${isNetworkConnected ? 'Connected' : 'Disconnected'}
     `;
     return asciiLogo + specs;
   },
@@ -520,6 +540,9 @@ Storage: ${storageInfo}
     }
   },
   'apt': function(args) {
+    if (!isNetworkConnected) {
+      return 'E: Network is down. Please connect to the network and try again.';
+    }
     if (args.length === 0) {
       return 'Usage: apt <command>\nCommands: install, search, remove, packages';
     }
@@ -568,6 +591,9 @@ Storage: ${storageInfo}
     return `Network speed set to ${speed} ${unit}/s`;
   },
   'net-show': function(args) {
+    if (!isNetworkConnected) {
+      return 'Network is disconnected';
+    }
     const showStable = args[0] === '--stable';
     const speed = showStable ? stableNetworkSpeed : currentNetworkSpeed;
     let unit, value;
@@ -676,7 +702,7 @@ Storage: ${storageInfo}
     if (!users.hasOwnProperty(username)) {
       return `User '${username}' does not exist.`;
     }
-    if (username === 'root' || username === 'user') {
+    if (username === 'root' || username === 'user' || username === 'toor') {
       return `Cannot delete system user '${username}'.`;
     }
     delete users[username];
@@ -697,17 +723,138 @@ Storage: ${storageInfo}
     if (!isRoot && currentUser !== username) {
       return 'Error: You can only change your own password unless you are root.';
     }
+    if (username === 'toor') {
+      return 'Error: Cannot change password for the toor account.';
+    }
     users[username].password = newPassword;
     return `Password for user '${username}' changed successfully.`;
   },
-  'kernel-panic': function() {
-    isKernelPanic = true;
-    kernelPanic.style.display = 'block';
-    return 'Kernel panic triggered. System halted.';
+  'reset': function() {
+    if (!isRoot) {
+      return 'Error: Root permissions required to reset the system.';
+    }
+
+    // Reset storage
+    usedStorage = 2 * 1024 * 1024 * 1024; // Reset to 2 GB base usage
+
+    // Reset users
+    const resetUsers = {
+      'root': {
+        password: '',
+        fileSystem: {
+          '/': {
+            'home': {
+              'root': {}
+            },
+            'etc': {},
+            'var': {},
+            'apt-pkgs': {}
+          }
+        }
+      },
+      'user': {
+        password: '',
+        fileSystem: {
+          '/': {
+            'home': {
+              'user': {
+                'documents': {
+                  'note.txt': 'This is a sample note.'
+                },
+                'downloads': {}
+              }
+            },
+            'etc': {},
+            'var': {},
+            'apt-pkgs': {}
+          }
+        }
+      },
+      'toor': {
+        password: '',
+        fileSystem: {
+          '/': {
+            'home': {
+              'toor': {}
+            },
+            'etc': {},
+            'var': {},
+            'apt-pkgs': {}
+          }
+        }
+      }
+    };
+
+    users = resetUsers;
+
+    // Reset current user to root
+    currentUser = 'root';
+    isRoot = true;
+    currentDirectory = '/';
+    loginMethod = 'default';
+    updatePrompt();
+
+    // Reset other variables
+    networkSpeed = 10 * 1024 * 1024;
+    stableNetworkSpeed = 10 *1024 * 1024;
+    currentNetworkSpeed = networkSpeed;
+    isLoggedIn = true;
+    isKernelPanic = false;
+    networkDelay = 0;
+    isNetworkConnected = true;
+
+    // Hide kernel panic screen if it was displayed
+    kernelPanic.style.display = 'none';
+    userInput.disabled = false;
+
+    // Clear terminal output
+    output.innerHTML = '';
+
+    updateUsedStorage();
+
+    return 'System reset complete. All storage and users (except root, user, and toor) have been reset.';
+  },
+  'net-sim-ping': function(args) {
+    if (!isNetworkConnected) {
+      return 'Error: Network is disconnected';
+    }
+    if (args.length !== 2) {
+      return 'Usage: net-sim-ping <ping> <ms/s>';
+    }
+    const ping = parseFloat(args[0]);
+    const unit = args[1].toLowerCase();
+    if (isNaN(ping) || ping < 0) {
+      return 'Error: Invalid ping value';
+    }
+    if (unit !== 'ms' && unit !== 's') {
+      return 'Error: Invalid unit. Use ms or s';
+    }
+    networkDelay = unit === 's' ? ping * 1000 : ping;
+    return `Network ping set to ${ping} ${unit}`;
+  },
+  'net-down': function() {
+    if (!isNetworkConnected) {
+      return 'Network is already disconnected';
+    }
+    isNetworkConnected = false;
+    return 'Network disconnected';
+  },
+  'net-up': function() {
+    if (isNetworkConnected) {
+      return 'Network is already connected';
+    }
+    isNetworkConnected = true;
+    return 'Network connected';
+  },
+  'net-utils': function() {
+    return 'Net-utils commands: net-sim-ping, net-down, net-up';
   }
 };
 
 function aptInstall(packages) {
+  if (!isNetworkConnected) {
+    return 'E: Unable to locate package. Is the network down?';
+  }
   if (packages.length === 0) {
     return 'E: No package specified';
   }
@@ -721,7 +868,7 @@ function aptInstall(packages) {
         output += `${pkg} is already installed.\n`;
       } else {
         const size = availablePackages[pkg].size;
-        const downloadTime = (size / currentNetworkSpeed) * 1000; // in milliseconds
+        const downloadTime = (size / currentNetworkSpeed) * 1000 + networkDelay; // in milliseconds
         output += `Installing ${pkg}...\n`;
         
         showProgressBar(pkg);
@@ -730,6 +877,12 @@ function aptInstall(packages) {
         (function(currentPkg) {
           let downloadedBytes = 0;
           const intervalId = setInterval(() => {
+            if (!isNetworkConnected) {
+              clearInterval(intervalId);
+              hideProgressBar();
+              addOutput(`Installation of ${currentPkg} failed: Network disconnected`);
+              return;
+            }
             downloadedBytes += currentNetworkSpeed / 10; // 100ms worth of data
             const progress = (downloadedBytes / size) * 100;
             if (progress <= 100) {
@@ -737,19 +890,28 @@ function aptInstall(packages) {
             }
             if (progress >= 100) {
               clearInterval(intervalId);
-              users[currentUser].fileSystem['/']['apt-pkgs'][currentPkg] = availablePackages[currentPkg].content;
-              updateUsedStorage();
-              hideProgressBar();
-              addOutput(`${currentPkg} has been installed.`);
-              // Add the command to the global commands object
-              commands[currentPkg] = function() {
-                return users[currentUser].fileSystem['/']['apt-pkgs'][currentPkg];
-              };
+              setTimeout(() => {
+                users[currentUser].fileSystem['/']['apt-pkgs'][currentPkg] = availablePackages[currentPkg].content;
+                updateUsedStorage();
+                hideProgressBar();
+                addOutput(`${currentPkg} has been installed.`);
+                // Add the command to the global commands object
+                if (currentPkg === 'net-utils') {
+                  commands['net-sim-ping'] = commands['net-sim-ping'];
+                  commands['net-down'] = commands['net-down'];
+                  commands['net-up'] = commands['net-up'];
+                  commands['net-utils'] = commands['net-utils'];
+                } else {
+                  commands[currentPkg] = function() {
+                    return users[currentUser].fileSystem['/']['apt-pkgs'][currentPkg];
+                  };
+                }
+              }, networkDelay);
             }
           }, 100);
         })(pkg);
         
-        output += `${pkg} will be installed in approximately ${(downloadTime / 1000).toFixed(2)} seconds.\n`;
+        output += `${pkg} will be installed in approximately ${((downloadTime + networkDelay) / 1000).toFixed(2)} seconds.\n`;
       }
     } else {
       output += `E: Unable to locate package ${pkg}\n`;
@@ -759,6 +921,9 @@ function aptInstall(packages) {
 }
 
 function aptSearch(terms) {
+  if (!isNetworkConnected) {
+    return 'E: Unable to locate package. Is the network down?';
+  }
   if (terms.length === 0) {
     return Object.keys(availablePackages).join('\n');
   }
@@ -779,7 +944,14 @@ function aptRemove(packages) {
   for (let pkg of packages) {
     if (users[currentUser].fileSystem['/']['apt-pkgs'] && users[currentUser].fileSystem['/']['apt-pkgs'].hasOwnProperty(pkg)) {
       delete users[currentUser].fileSystem['/']['apt-pkgs'][pkg];
-      delete commands[pkg];
+      if (pkg === 'net-utils') {
+        delete commands['net-sim-ping'];
+        delete commands['net-down'];
+        delete commands['net-up'];
+        delete commands['net-utils'];
+      } else {
+        delete commands[pkg];
+      }
       updateUsedStorage();
       output += `${pkg} has been removed.\n`;
     } else {
@@ -880,6 +1052,10 @@ function findCustomCommands() {
 }
 
 function executeCommand(input) {
+  if (!isNetworkConnected && ['apt', 'net-sim', 'net-show', 'net-sim-ping'].includes(input.split(' ')[0])) {
+    return 'Error: Network is disconnected. Command cannot be executed.';
+  }
+
   const [cmd, ...args] = input.trim().split(/\s+/);
   if (commands.hasOwnProperty(cmd)) {
     if (typeof commands[cmd] === 'function') {
@@ -987,6 +1163,7 @@ nanoContent.addEventListener('keydown', function(event) {
 
 // Function to update network speed
 function updateNetworkSpeed() {
+  if (!isNetworkConnected) return;
   const minSpeed = stableNetworkSpeed * 0.2; // 80% less than stable speed
   const maxSpeed = stableNetworkSpeed * 1.85; // 85% more than stable speed
   currentNetworkSpeed = Math.random() * (maxSpeed - minSpeed) + minSpeed;
@@ -1018,7 +1195,8 @@ if (typeof module !== 'undefined' && module.exports) {
     aptSearch,
     aptRemove,
     aptPackages,
-    availablePackages
+    availablePackages,
+    isNetworkConnected
   };
 }
 </script>
