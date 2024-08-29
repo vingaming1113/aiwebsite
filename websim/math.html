@@ -85,7 +85,7 @@
 function generateEquation() {
     const targetNumber = parseFloat(document.getElementById('targetNumber').value);
     const difficulty = parseFloat(document.getElementById('difficulty').value);
-    const seed = parseInt(document.getElementById('seed').value) || Math.floor(Math.random() * 1000000);
+    const seed = parseInt(document.getElementById('seed').value) || Math.floor(Math.random() * 12000000);
     
     if (isNaN(targetNumber) || isNaN(difficulty)) {
         document.getElementById('result').innerHTML = "<p style='color: #e74c3c;'>Please enter valid numbers for Result Number and Difficulty Level.</p>";
