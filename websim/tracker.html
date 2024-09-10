@@ -1,0 +1,168 @@
+<html><head><base href="https://websimengine.com/text-tracker-ai/">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Text-Based Personal Tracker</title>
+<style>
+  body {
+    font-family: 'Courier New', Courier, monospace;
+    background-color: #000;
+    color: #0f0;
+    margin: 0;
+    padding: 20px;
+    line-height: 1.6;
+  }
+  #terminal {
+    max-width: 800px;
+    margin: 0 auto;
+    border: 1px solid #0f0;
+    padding: 20px;
+    overflow-y: auto;
+    height: 90vh;
+  }
+  #input-line {
+    display: flex;
+    margin-top: 20px;
+  }
+  #prompt {
+    color: #0f0;
+    margin-right: 10px;
+  }
+  #user-input {
+    background-color: transparent;
+    border: none;
+    color: #0f0;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 16px;
+    flex-grow: 1;
+    outline: none;
+  }
+  .blink {
+    animation: blink-animation 1s steps(5, start) infinite;
+  }
+  @keyframes blink-animation {
+    to {
+      visibility: hidden;
+    }
+  }
+</style>
+</head>
+<body>
+<div id="terminal">
+  <div id="output"></div>
+  <div id="input-line">
+    <span id="prompt">&gt;</span>
+    <input type="text" id="user-input" autofocus>
+    <span class="blink">_</span>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const output = document.getElementById('output');
+  const userInput = document.getElementById('user-input');
+  let visitCount, userCity, userOS;
+
+  function print(text) {
+    output.innerHTML += text + '<br>';
+    output.scrollTop = output.scrollHeight;
+  }
+
+  function getOS() {
+    const userAgent = window.navigator.userAgent,
+          platform = window.navigator.platform,
+          macosPlatforms = ['Macintosh', 'MacIntel', 'MacPPC', 'Mac68K'],
+          windowsPlatforms = ['Win32', 'Win64', 'Windows', 'WinCE'],
+          iosPlatforms = ['iPhone', 'iPad', 'iPod'];
+
+    if (macosPlatforms.indexOf(platform) !== -1) return 'macOS';
+    if (iosPlatforms.indexOf(platform) !== -1) return 'iOS';
+    if (windowsPlatforms.indexOf(platform) !== -1) return 'Windows';
+    if (/Android/.test(userAgent)) return 'Android';
+    if (/Linux/.test(platform)) return 'Linux';
+    return 'Unknown OS';
+  }
+
+  function initializeTracker() {
+    print('Initializing personal tracker...');
+    
+    // Visit counter
+    visitCount = localStorage.getItem('visitCount') || 0;
+    visitCount = parseInt(visitCount) + 1;
+    localStorage.setItem('visitCount', visitCount);
+    print(`Visit count: ${visitCount}`);
+
+    // Detect OS
+    userOS = getOS();
+    print(`Detected OS: ${userOS}`);
+
+    // Detect city
+    print('Detecting location...');
+    fetch('https://ipapi.co/json/')
+      .then(response => response.json())
+      .then(data => {
+        userCity = data.city || 'Unknown';
+        print(`Detected city: ${userCity}`);
+        print('\nTracker initialized. Type "help" for available commands.');
+      })
+      .catch(error => {
+        console.error('Error fetching location:', error);
+        userCity = 'Unable to detect';
+        print(`Failed to detect city. Error: ${error.message}`);
+        print('\nTracker initialized with limited data. Type "help" for available commands.');
+      });
+  }
+
+  function handleCommand(command) {
+    switch(command.toLowerCase()) {
+      case 'help':
+        print('Available commands:');
+        print('  stats - Display your personal stats');
+        print('  ai - Get a message from the AI');
+        print('  clear - Clear the terminal');
+        print('  exit - Close the session');
+        break;
+      case 'stats':
+        print(`Visit count: ${visitCount}`);
+        print(`City: ${userCity}`);
+        print(`OS: ${userOS}`);
+        break;
+      case 'ai':
+        const messages = [
+          `Greetings, user! This is visit #${visitCount} from ${userCity}.`,
+          `A ${userOS} user from ${userCity}? Intriguing combination!`,
+          `${visitCount} visits? Your persistence is admirable.`,
+          `How's the weather in ${userCity} today? Your ${userOS} device might know.`,
+          `${visitCount} times you've connected. ${userCity} must have excellent internet!`
+        ];
+        print('AI: ' + messages[Math.floor(Math.random() * messages.length)]);
+        break;
+      case 'clear':
+        output.innerHTML = '';
+        break;
+      case 'exit':
+        print('Closing session...');
+        setTimeout(() => {
+          output.innerHTML = 'Session terminated. Refresh to start a new session.';
+          userInput.disabled = true;
+        }, 1000);
+        break;
+      default:
+        print(`Unknown command: ${command}`);
+        print('Type "help" for available commands.');
+    }
+  }
+
+  userInput.addEventListener('keyup', function(event) {
+    if (event.key === 'Enter') {
+      const command = this.value.trim();
+      print(`> ${command}`);
+      this.value = '';
+      handleCommand(command);
+    }
+  });
+
+  initializeTracker();
+});
+</script>
+</body>
+</html>
